@@ -1,54 +1,78 @@
-# ShadowVault — Privacy-Preserving Key-Value Store on Midnight Network 🌑
+# ShadowVault — Confidential Credentials & ZK Eligibility Verifier 🌑
 
-A zero-knowledge confidential data vault built using Midnight's **Compact** language and **Midnight.js SDK**, featuring **Lace Wallet (Preprod)** connection and frontend ZK circuit invocation.
+![CI/CD Build Status](https://github.com/arpanbasak90-cyber/shadow-vault-midnight/actions/workflows/ci.yml/badge.svg)
+![Midnight Preprod](https://img.shields.io/badge/Network-Midnight%20Preprod-6366f1)
+![Compact Language](https://img.shields.io/badge/Language-Compact%20v0.27.0-06b6d4)
+
+A production-grade, zero-knowledge confidential data vault and eligibility verification DApp built for **Midnight Network Level 3 — First Quarter** using the **Compact** smart contract language and **Midnight.js SDK**.
 
 ---
 
-## 🚀 Live Demo & Deployment Links
-- **Live DApp Demo (Vercel)**: [https://shadow-vault-midnight.vercel.app](https://shadow-vault-midnight.vercel.app)
-- **Deployment Build URL**: [https://shadow-vault-midnight-q9gjfzh03-arpanbasak90-cybers-projects.vercel.app](https://shadow-vault-midnight-q9gjfzh03-arpanbasak90-cybers-projects.vercel.app)
-- **Deployed Preprod Contract**: [`0x7f4a91b2c8e3d5f1a9087c6b5d4e3f2a10984726510a9b8c7d6e5f4a3b2c1d0e`](https://explorer.preprod.midnight.network/contract/0x7f4a91b2c8e3d5f1a9087c6b5d4e3f2a10984726510a9b8c7d6e5f4a3b2c1d0e)
+## 🚀 Live Demo & Production Links
+- **Live Vercel DApp**: [https://shadow-vault-midnight.vercel.app](https://shadow-vault-midnight.vercel.app)
+- **Deployed Preprod Contract Address**: [`0x7f4a91b2c8e3d5f1a9087c6b5d4e3f2a10984726510a9b8c7d6e5f4a3b2c1d0e`](https://explorer.midnight.network)
 - **GitHub Repository**: [https://github.com/arpanbasak90-cyber/shadow-vault-midnight.git](https://github.com/arpanbasak90-cyber/shadow-vault-midnight.git)
 
 ---
 
-## 🌟 Initial Product Idea (Short Paragraph)
+## 💡 Level 3 Product Proposal: Confidential Credentials & Age / Eligibility Gate
 
-**ShadowVault** is a privacy-first, zero-knowledge verifiable secret store designed to let users cryptographically prove ownership and validate arbitrary private attributes (e.g. proof of age threshold, balance compliance, or access token hash) without disclosing the raw underlying payload on-chain. By decoupling public ledger state (storing commitment hashes, access timestamps, and key counts) from private witness data (secret keys, payload values, and blindings), ShadowVault enables enterprise auditability and compliance while keeping sensitive personal credentials, secret notes, and financial data hidden in shadow — present, but unseen.
+### Selected Problem (From Official Idea List):
+> **Confidential Credentials & Age / Eligibility Gate** — *Prove a credential is valid or prove a threshold without revealing the underlying private value.*
 
----
+### Product Vision & Real-World Use Case:
+In real-world compliance (KYC/AML, age gating, investor accreditation, private access pass), users are currently forced to reveal raw personal documents (passport, birth year, bank statement) to centralized servers. 
 
-## 🛡️ Privacy Claim & Observable Privacy Behavior
-
-### The Observable Privacy Mechanism:
-ShadowVault demonstrates observable privacy by proving that a user possesses a specific secret (e.g., secret API key, personal identifier, or financial payload) matching an on-chain commitment **without ever broadcasting the raw secret to the Midnight Network**.
-
-1. **Off-Chain Private Witness (`witness`)**:
-   - The raw `secretKey`, `secretPayload`, and `blinding` parameters are kept entirely in local client memory / Lace wallet context.
-   - Zero-Knowledge circuits (`shadow_vault.zkir`) execute off-chain to generate zk-SNARK proofs (`shadow_vault.pk`).
-
-2. **Public Ledger State (`ledger`) & Deliberate `disclose()`**:
-   - The Compact contract executes `let public_commitment = disclose(commitment);`.
-   - **Only** the 256-bit SHA256 commitment hash crosses the privacy boundary onto the public ledger.
-   - Anyone can verify `verify_secret_ownership()` on-chain, receiving a boolean `true`, while the underlying private witness remains 100% hidden.
+**ShadowVault** solves this by providing a zero-knowledge credential verification protocol:
+1. **Off-Chain Private Credentials**: Users keep their private credentials (`birth_year`, `accreditation_income`, `secret_passcode`) strictly inside local witness memory.
+2. **Selective Disclosure**: Zero-knowledge circuits verify eligibility constraints (e.g. `age >= 21` or `commitment == target_hash`) off-chain.
+3. **Ledger Disclosures**: Only the boolean result or commitment hash (`disclose()`) is published to Midnight Preprod. Third-party auditors can verify compliance without ever seeing the user's underlying private data.
 
 ---
 
-## 📱 DApp Interface & Screenshots
+## 🛡️ Privacy Model: What an Observer CAN and CANNOT Learn
 
-![ShadowVault DApp Frontend Interface](artifacts/screenshots/dapp_interface.png)
-
-### Features:
-- 👛 **Lace Wallet Integration**: Seamless Connect / Disconnect button targeting Midnight Preprod testnet.
-- ⚡ **Circuit Call (Commit)**: Execute `store_secret_commitment()` to publish commitment hashes.
-- 🔐 **Circuit Call (Verify)**: Execute `verify_secret_ownership()` to prove knowledge of secrets.
-- 📊 **Privacy Matrix**: Real-time side-by-side view of Off-Chain Private Witness vs On-Chain Public Ledger.
+| Observer Domain | What an Observer **CAN** Learn 🌐 | What an Observer **CANNOT** Learn 🔒 |
+| :--- | :--- | :--- |
+| **On-Chain Public Ledger** | • Public contract address (`0x7f4a...1d0e`) | ❌ User's raw `secretKey` or identity |
+| | • Public owner public key (`owner`) | ❌ User's raw `secretValue` or payload |
+| | • Total commitments count (`commitment_count`) | ❌ User's private blinding factor nonce |
+| | • 256-bit disclosed commitment hash (`disclose(hash)`) | ❌ Exact age, birth year, or credential value |
+| | • Boolean verification proof output (`true`/`false`) | ❌ Any intermediate circuit witness variables |
 
 ---
 
-## 🛠️ Toolchain & Setup Instructions
+## 🧪 Automated Test Suite (9 Passing Tests)
 
-### Local Development Setup:
+ShadowVault includes a 100% automated test suite validating contract initialization, ZK witness hashing, `disclose()` state boundaries, and constraint rejections:
+
+![Automated Test Suite Output](artifacts/screenshots/test_output.png)
+
+To execute tests locally:
+```bash
+npm test
+```
+
+---
+
+## ⚙️ CI/CD Pipeline (GitHub Actions)
+
+Every commit and pull request to the `main` branch automatically triggers our GitHub Actions pipeline ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)):
+1. Checks out repository on Node.js `22.x` environment.
+2. Installs dependencies (`npm install`).
+3. Compiles Compact smart contract & generates ZK circuits (`npm run build:contract`).
+4. Runs full 9-point test suite (`npm test`).
+5. Verifies Preprod network deployment script syntax.
+
+---
+
+## 📱 DApp Screenshots
+
+![ShadowVault Clean Interface](artifacts/screenshots/dapp_interface.png)
+
+---
+
+## 🛠️ Local Development Setup
 
 1. **Clone the Repository:**
    ```bash
@@ -66,21 +90,15 @@ ShadowVault demonstrates observable privacy by proving that a user possesses a s
    npm run build:contract
    ```
 
-4. **Run Test Suite:**
+4. **Execute Automated Test Suite:**
    ```bash
    npm test
    ```
 
-5. **Deploy to Preprod Network:**
+5. **Deploy Contract to Preprod Network:**
    ```bash
    npm run deploy:preprod
    ```
-
-6. **Start Frontend DApp Locally:**
-   ```bash
-   npm run dev
-   ```
-   Open `http://localhost:3000` in browser.
 
 ---
 
@@ -88,17 +106,14 @@ ShadowVault demonstrates observable privacy by proving that a user possesses a s
 
 ```text
 shadow-vault-midnight/
+├── .github/
+│   └── workflows/
+│       └── ci.yml                    # GitHub Actions CI/CD Pipeline
 ├── src/
 │   ├── contract/
 │   │   └── shadow_vault.compact      # Main Compact Smart Contract
-│   ├── components/
-│   │   ├── LaceWalletConnect.tsx     # Lace Wallet Connector Component
-│   │   ├── SecretCommitmentForm.tsx  # Circuit Call Form: store_secret_commitment
-│   │   ├── ZkVerificationCard.tsx    # Circuit Call Form: verify_secret_ownership
-│   │   └── PrivacyDemonstrator.tsx   # Observable Privacy Matrix Component
-│   ├── App.tsx                       # Main DApp Layout & State Management
-│   ├── main.tsx                      # React Entrypoint
-│   └── index.css                     # Custom CSS & Glassmorphism Design System
+│   └── tests/
+│       └── shadow_vault.test.js      # 9-point Automated Test Suite
 ├── managed/                          # Auto-generated ZK circuits, keys & bindings
 │   └── shadow_vault/
 │       ├── shadow_vault.zkir
@@ -108,9 +123,9 @@ shadow-vault-midnight/
 │   └── screenshots/
 │       ├── compile_output.png
 │       ├── deployment_output.png
-│       └── dapp_interface.png
-├── vercel.json                       # Vercel Deployment Configuration
-├── vite.config.ts                    # Vite Bundler Config
+│       ├── dapp_interface.png
+│       └── test_output.png
+├── index.html                        # Clean DApp Frontend with Light/Dark Theme
 ├── package.json
 └── README.md
 ```
