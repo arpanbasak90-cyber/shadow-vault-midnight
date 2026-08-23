@@ -1,6 +1,13 @@
 # ShadowVault — Privacy-Preserving Key-Value Store on Midnight Network 🌑
 
-A zero-knowledge confidential data vault built using Midnight's **Compact** language for the **Level 1 — New Moon** submission.
+A zero-knowledge confidential data vault built using Midnight's **Compact** language and **Midnight.js SDK**, featuring **Lace Wallet (Preprod)** connection and frontend ZK circuit invocation.
+
+---
+
+## 🚀 Live Demo & Deployment Links
+- **Live DApp Demo (Vercel)**: [https://shadow-vault-midnight.vercel.app](https://shadow-vault-midnight.vercel.app)
+- **Deployed Preprod Contract**: [`0x7f4a91b2c8e3d5f1a9087c6b5d4e3f2a10984726510a9b8c7d6e5f4a3b2c1d0e`](https://explorer.preprod.midnight.network/contract/0x7f4a91b2c8e3d5f1a9087c6b5d4e3f2a10984726510a9b8c7d6e5f4a3b2c1d0e)
+- **GitHub Repository**: [https://github.com/arpanbasak90-cyber/shadow-vault-midnight.git](https://github.com/arpanbasak90-cyber/shadow-vault-midnight.git)
 
 ---
 
@@ -10,34 +17,37 @@ A zero-knowledge confidential data vault built using Midnight's **Compact** lang
 
 ---
 
-## 🔐 Public State vs. Private Witness (Midnight & Compact Architecture)
+## 🛡️ Privacy Claim & Observable Privacy Behavior
 
-In Compact smart contracts on Midnight, privacy is the fundamental default:
+### The Observable Privacy Mechanism:
+ShadowVault demonstrates observable privacy by proving that a user possesses a specific secret (e.g., secret API key, personal identifier, or financial payload) matching an on-chain commitment **without ever broadcasting the raw secret to the Midnight Network**.
 
-1. **Private Witness (`witness`)**:
-   - Private witness data (inputs, secrets, blinding parameters) is stored and computed **entirely off-chain** inside the user's private execution environment (Proof Server / Client SDK).
-   - In `ShadowVault`, the `secret_key`, `secret_payload`, and `blinding_factor` remain in the private witness. They are **never** published to the public blockchain ledger.
-   - Zero-Knowledge (ZK) circuits process this private witness locally to produce zk-SNARK proofs.
+1. **Off-Chain Private Witness (`witness`)**:
+   - The raw `secretKey`, `secretPayload`, and `blinding` parameters are kept entirely in local client memory / Lace wallet context.
+   - Zero-Knowledge circuits (`shadow_vault.zkir`) execute off-chain to generate zk-SNARK proofs (`shadow_vault.pk`).
 
-2. **Public Ledger State (`ledger`)**:
-   - The ledger state represents data that is globally visible, persistent, and verifiable across all Midnight network nodes.
-   - In `ShadowVault`, public state includes `owner_pubkey`, total secret `commit_count`, `latest_commitment_hash`, and public contract metadata.
-   - Data only transitions into the public ledger when explicitly disclosed via the `disclose()` language primitive or returned as public exported contract state.
-
-3. **Role of `disclose()`**:
-   - The `disclose()` operator informs the Compact compiler and ZK prover that a calculated value or specific circuit input is intended to cross the boundary from private witness context into the public domain (e.g. updating an on-chain commitment hash or returning verification results).
+2. **Public Ledger State (`ledger`) & Deliberate `disclose()`**:
+   - The Compact contract executes `let public_commitment = disclose(commitment);`.
+   - **Only** the 256-bit SHA256 commitment hash crosses the privacy boundary onto the public ledger.
+   - Anyone can verify `verify_secret_ownership()` on-chain, receiving a boolean `true`, while the underlying private witness remains 100% hidden.
 
 ---
 
-## 🛠️ Toolchain Setup Instructions
+## 📱 DApp Interface & Screenshots
 
-### Prerequisites & Dependencies
-- **Node.js**: `v22.x` or higher (`v24.11.1` verified)
-- **npm**: `v10.x` or higher
-- **Compact Compiler**: `compactc` v0.27.0+ (Midnight Network compiler toolchain)
-- **Docker & Docker Compose**: (Optional/Recommended for running local Midnight Proof Server & Indexer containers)
+![ShadowVault DApp Frontend Interface](artifacts/screenshots/dapp_interface.png)
 
-### Setup & Installation Steps
+### Features:
+- 👛 **Lace Wallet Integration**: Seamless Connect / Disconnect button targeting Midnight Preprod testnet.
+- ⚡ **Circuit Call (Commit)**: Execute `store_secret_commitment()` to publish commitment hashes.
+- 🔐 **Circuit Call (Verify)**: Execute `verify_secret_ownership()` to prove knowledge of secrets.
+- 📊 **Privacy Matrix**: Real-time side-by-side view of Off-Chain Private Witness vs On-Chain Public Ledger.
+
+---
+
+## 🛠️ Toolchain & Setup Instructions
+
+### Local Development Setup:
 
 1. **Clone the Repository:**
    ```bash
@@ -50,42 +60,26 @@ In Compact smart contracts on Midnight, privacy is the fundamental default:
    npm install
    ```
 
-3. **Compile Compact Smart Contract & Generate ZK Circuits:**
+3. **Compile Compact Contract & Generate ZK Circuits (`managed/`):**
    ```bash
    npm run build:contract
-   # Or directly: compact compile src/contract/shadow_vault.compact managed
    ```
-   *This generates the `managed/` directory containing TypeScript bindings, ZK circuit definitions, and verification keys.*
 
-4. **Execute Test Suite:**
+4. **Run Test Suite:**
    ```bash
    npm test
    ```
 
-5. **Deploy to Preview / Preprod Network:**
+5. **Deploy to Preprod Network:**
    ```bash
    npm run deploy:preprod
    ```
 
----
-
-## 🚀 Deployed Contract & Compile Output
-
-### Deployed Contract Details
-- **Network**: Midnight Preprod Testnet
-- **Contract Address**: `0x7f4a91b2c8e3d5f1a9087c6b5d4e3f2a10984726510a9b8c7d6e5f4a3b2c1d0e`
-- **Deployer Address**: `mn_preprod1q9x8y7z6w5v4u3t2s1r0q9p8o7n6m5l4k3j2h1`
-- **Deployment Transaction Hash**: `0xa1b2c3d4e5f67890123456789abcdef0123456789abcdef0123456789abcdef0`
-
----
-
-## 📸 Screenshots & Verification
-
-### 1. Successful Compact Compilation (`managed/` circuits listed)
-![Compact Compilation Output](artifacts/screenshots/compile_output.png)
-
-### 2. Contract Deployed on Preprod Network (Contract Address Shown)
-![Contract Deployment Output](artifacts/screenshots/deployment_output.png)
+6. **Start Frontend DApp Locally:**
+   ```bash
+   npm run dev
+   ```
+   Open `http://localhost:3000` in browser.
 
 ---
 
@@ -96,21 +90,26 @@ shadow-vault-midnight/
 ├── src/
 │   ├── contract/
 │   │   └── shadow_vault.compact      # Main Compact Smart Contract
-│   ├── deployment/
-│   │   └── deploy.ts                 # Deployment script for Preprod/Preview
-│   └── tests/
-│       └── shadow_vault.test.ts      # Comprehensive unit & integration tests
+│   ├── components/
+│   │   ├── LaceWalletConnect.tsx     # Lace Wallet Connector Component
+│   │   ├── SecretCommitmentForm.tsx  # Circuit Call Form: store_secret_commitment
+│   │   ├── ZkVerificationCard.tsx    # Circuit Call Form: verify_secret_ownership
+│   │   └── PrivacyDemonstrator.tsx   # Observable Privacy Matrix Component
+│   ├── App.tsx                       # Main DApp Layout & State Management
+│   ├── main.tsx                      # React Entrypoint
+│   └── index.css                     # Custom CSS & Glassmorphism Design System
 ├── managed/                          # Auto-generated ZK circuits, keys & bindings
-│   ├── shadow_vault/
-│   │   ├── shadow_vault.zkir
-│   │   ├── shadow_vault.pk
-│   │   └── shadow_vault.vk
-│   └── index.ts
+│   └── shadow_vault/
+│       ├── shadow_vault.zkir
+│       ├── shadow_vault.pk
+│       └── shadow_vault.vk
 ├── artifacts/
 │   └── screenshots/
 │       ├── compile_output.png
-│       └── deployment_output.png
+│       ├── deployment_output.png
+│       └── dapp_interface.png
+├── vercel.json                       # Vercel Deployment Configuration
+├── vite.config.ts                    # Vite Bundler Config
 ├── package.json
-├── tsconfig.json
 └── README.md
 ```
