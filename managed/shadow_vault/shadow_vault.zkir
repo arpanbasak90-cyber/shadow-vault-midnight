@@ -1,0 +1,36 @@
+{
+  "contract": "ShadowVault",
+  "version": "0.27.0",
+  "circuits": {
+    "initialize": {
+      "inputs": [
+        "Bytes<32>"
+      ],
+      "outputs": [],
+      "constraints": 142
+    },
+    "store_secret_commitment": {
+      "inputs": [
+        "witness:key",
+        "witness:val",
+        "witness:blinding"
+      ],
+      "outputs": [
+        "disclose:Bytes<32>"
+      ],
+      "constraints": 1845
+    },
+    "verify_secret_ownership": {
+      "inputs": [
+        "Bytes<32>",
+        "witness:key",
+        "witness:val",
+        "witness:blinding"
+      ],
+      "outputs": [
+        "disclose:Boolean"
+      ],
+      "constraints": 1890
+    }
+  }
+}

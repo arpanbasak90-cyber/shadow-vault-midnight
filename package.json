@@ -1,0 +1,35 @@
+{
+  "name": "shadow-vault-midnight",
+  "version": "1.0.0",
+  "description": "Privacy-Preserving Key-Value Store & Secret Commitment Vault on Midnight Network",
+  "main": "dist/index.js",
+  "scripts": {
+    "build:contract": "node scripts/compile_contract.js",
+    "compact compile": "node scripts/compile_contract.js",
+    "test": "jest",
+    "deploy:preprod": "node dist/deployment/deploy.js",
+    "build": "tsc"
+  },
+  "keywords": [
+    "midnight",
+    "compact",
+    "zk-proofs",
+    "privacy",
+    "blockchain"
+  ],
+  "author": "Midnight Builder",
+  "license": "MIT",
+  "dependencies": {
+    "@midnight-ntwrk/compact-js": "^2.5.3",
+    "@midnight-ntwrk/compact-runtime": "^0.16.0",
+    "@midnight-ntwrk/midnight-js": "^4.1.1",
+    "@midnight-ntwrk/wallet-sdk": "^1.1.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/node": "^22.0.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.5",
+    "typescript": "^5.4.5"
+  }
+}
