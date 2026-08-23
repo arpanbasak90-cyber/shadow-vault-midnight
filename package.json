@@ -4,6 +4,9 @@
   "description": "Privacy-Preserving Key-Value Store & Secret Commitment Vault on Midnight Network",
   "main": "dist/index.js",
   "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
     "build:contract": "node scripts/compile_contract.js",
     "compact compile": "node scripts/compile_contract.js",
     "test": "node scripts/run_tests.js",
@@ -17,5 +20,13 @@
     "blockchain"
   ],
   "author": "Midnight Builder",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "vite": "^5.2.11"
+  }
 }
