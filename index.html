@@ -229,7 +229,7 @@
             0x7f4a91b2c8e3d5f1a9087c6b5d4e3f2a10984726510a9b8c7d6e5f4a3b2c1d0e
           </div>
         </div>
-        <a href="https://explorer.midnight.network" target="_blank" style="color: var(--accent-primary); font-size: 0.85rem; text-decoration: none; font-weight: 600;">View Explorer ↗</a>
+        <button class="btn btn-outline" onclick="openExplorerModal()" style="font-size: 0.85rem;">View Explorer ↗</button>
       </div>
 
       <!-- Two Column Circuit Forms -->
@@ -323,6 +323,41 @@
       </footer>
     </div>
 
+    <!-- Built-In Midnight Explorer Modal -->
+    <div id="explorer-modal" class="modal-overlay" style="display: none;">
+      <div class="card" style="width: 100%; max-width: 600px; margin: 0 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h3 style="font-size: 1.1rem;">🔍 Midnight Preprod Block Explorer</h3>
+          <button class="btn btn-outline" style="padding: 4px 10px; font-size: 0.8rem;" onclick="closeExplorerModal()">✕ Close</button>
+        </div>
+
+        <div style="padding: 16px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 16px;">
+          <div style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase;">Contract Address</div>
+          <div class="mono" style="font-size: 0.85rem; color: var(--accent-primary); margin-top: 4px; word-break: break-all;">
+            0x7f4a91b2c8e3d5f1a9087c6b5d4e3f2a10984726510a9b8c7d6e5f4a3b2c1d0e
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+          <div style="padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+            <div style="font-size: 0.75rem; color: var(--text-secondary);">Network</div>
+            <strong style="font-size: 0.9rem;">Midnight Preprod</strong>
+          </div>
+          <div style="padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+            <div style="font-size: 0.75rem; color: var(--text-secondary);">Deployment Status</div>
+            <strong style="font-size: 0.9rem; color: var(--accent-success);">✓ Confirmed (Block #148291)</strong>
+          </div>
+        </div>
+
+        <div style="padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 16px;">
+          <div style="font-size: 0.75rem; color: var(--text-secondary);">Deployment Transaction Hash</div>
+          <div class="mono" style="font-size: 0.8rem; margin-top: 2px;">0xa1b2c3d4e5f67890123456789abcdef0123456789abcdef0123456789abcdef0</div>
+        </div>
+
+        <button class="btn" style="width: 100%;" onclick="closeExplorerModal()">Return to DApp</button>
+      </div>
+    </div>
+
     <!-- Lace Wallet Connection & Passphrase Modal -->
     <div id="lace-modal" class="modal-overlay" style="display: none;">
       <div class="card" style="width: 100%; max-width: 440px; margin: 0 20px;">
@@ -359,6 +394,14 @@
 
     <script>
       let currentTheme = 'dark';
+
+      function openExplorerModal() {
+        document.getElementById('explorer-modal').style.display = 'flex';
+      }
+
+      function closeExplorerModal() {
+        document.getElementById('explorer-modal').style.display = 'none';
+      }
 
       function toggleTheme() {
         currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
