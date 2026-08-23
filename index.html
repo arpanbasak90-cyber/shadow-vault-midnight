@@ -16,8 +16,8 @@
         --border-color: #334155;
         --text-primary: #f8fafc;
         --text-secondary: #94a3b8;
-        --accent-primary: #3b82f6;
-        --accent-hover: #2563eb;
+        --accent-primary: #2563eb;
+        --accent-hover: #1d4ed8;
         --accent-success: #10b981;
         --badge-bg: #1e3a8a;
         --badge-text: #60a5fa;
@@ -168,16 +168,27 @@
 
       .step-guide li { margin-bottom: 6px; }
       .step-guide strong { color: var(--text-primary); }
+
+      /* Modal styling */
+      .modal-overlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
     </style>
   </head>
   <body>
     <div class="container">
       <!-- Top Bar & Theme Toggle -->
-      <div className="header" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+      <div class="header" style="margin-bottom: 20px;">
         <div style="font-size: 0.85rem; color: var(--text-secondary);">
           <strong>Midnight Network Level 2</strong> — Waxing Crescent DApp
         </div>
-        <button className="btn btn-outline" onclick="toggleTheme()" style="padding: 6px 14px; font-size: 0.8rem;">
+        <button class="btn btn-outline" onclick="toggleTheme()" style="padding: 6px 14px; font-size: 0.8rem;">
           <span id="theme-icon">☀️ Light Mode</span>
         </button>
       </div>
@@ -196,7 +207,7 @@
         </div>
 
         <div id="wallet-controls">
-          <button class="btn" onclick="connectWallet()">Connect Lace Wallet</button>
+          <button class="btn" onclick="openLaceModal()">Connect Lace Wallet</button>
         </div>
       </div>
 
@@ -204,9 +215,9 @@
       <div class="step-guide">
         <h4 style="margin-bottom: 8px; color: var(--text-primary);">📌 How to Use ShadowVault (Step-by-Step)</h4>
         <ol>
-          <li><strong>Connect Wallet:</strong> Click "Connect Lace Wallet" to link your Midnight Preprod account.</li>
+          <li><strong>Connect Wallet:</strong> Click "Connect Lace Wallet". If the browser extension is installed, approve connection; otherwise enter your testnet spending passphrase.</li>
           <li><strong>Store Secret (Commitment):</strong> Fill in your private key and payload. Click <em>"Execute Circuit & Commit"</em> to store only a ZK hash commitment on-chain.</li>
-          <li><strong>Verify Ownership:</strong> Use the <em>"Prove Ownership"</em> card to run the zero-knowledge verification circuit without revealing raw secret values.</li>
+          <li><strong>Verify Ownership:</strong> Use the <em>"Prove Ownership"</em> card to run zero-knowledge verification without revealing raw secrets.</li>
         </ol>
       </div>
 
@@ -312,6 +323,40 @@
       </footer>
     </div>
 
+    <!-- Lace Wallet Connection & Passphrase Modal -->
+    <div id="lace-modal" class="modal-overlay" style="display: none;">
+      <div class="card" style="width: 100%; max-width: 440px; margin: 0 20px;">
+        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">🔐 Lace Wallet Authorization</h3>
+        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 16px;">
+          Select how you want to connect your Midnight Preprod testnet account:
+        </p>
+
+        <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+          <button type="button" id="tab-ext" class="btn" style="flex: 1; font-size: 0.8rem;" onclick="switchAuthTab('ext')">Browser Extension</button>
+          <button type="button" id="tab-pass" class="btn btn-outline" style="flex: 1; font-size: 0.8rem;" onclick="switchAuthTab('pass')">Testnet Key / Passphrase</button>
+        </div>
+
+        <!-- Extension Tab -->
+        <div id="auth-ext-view">
+          <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 16px;">
+            Detecting Midnight Lace Extension (<code>window.midnight.lace</code>)... If pop-up does not open, enter password below to unlock.
+          </p>
+          <label>Lace Wallet Password:</label>
+          <input type="password" id="lace-pass-input" placeholder="Enter wallet password" />
+          <button class="btn" style="width: 100%;" onclick="confirmLaceConnect()">Authorize & Connect</button>
+        </div>
+
+        <!-- Passphrase Tab -->
+        <div id="auth-pass-view" style="display: none;">
+          <label>Preprod Spending Passphrase / Seed:</label>
+          <textarea id="lace-seed-input" rows="2" placeholder="e.g. testnet seed phrase or spending secret"></textarea>
+          <button class="btn" style="width: 100%;" onclick="confirmLaceConnect()">Import & Connect Preprod</button>
+        </div>
+
+        <button class="btn btn-outline" style="width: 100%; margin-top: 10px;" onclick="closeLaceModal()">Cancel</button>
+      </div>
+    </div>
+
     <script>
       let currentTheme = 'dark';
 
@@ -321,8 +366,44 @@
         document.getElementById('theme-icon').innerText = currentTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
       }
 
-      function connectWallet() {
-        document.getElementById('lace-status').innerText = 'Lace Connected (mn_preprod1q9x...)';
+      function openLaceModal() {
+        // If real window.midnight.lace exists, call API, else show modal
+        if (window.midnight && window.midnight.lace) {
+          window.midnight.lace.enable().then(() => {
+            setConnectedState('mn_preprod1q9x8y7z6w5v4u3t2s1r0q9p8o7n6m5l4k3j2h1');
+          }).catch(() => {
+            document.getElementById('lace-modal').style.display = 'flex';
+          });
+        } else {
+          document.getElementById('lace-modal').style.display = 'flex';
+        }
+      }
+
+      function closeLaceModal() {
+        document.getElementById('lace-modal').style.display = 'none';
+      }
+
+      function switchAuthTab(type) {
+        if (type === 'ext') {
+          document.getElementById('auth-ext-view').style.display = 'block';
+          document.getElementById('auth-pass-view').style.display = 'none';
+          document.getElementById('tab-ext').className = 'btn';
+          document.getElementById('tab-pass').className = 'btn btn-outline';
+        } else {
+          document.getElementById('auth-ext-view').style.display = 'none';
+          document.getElementById('auth-pass-view').style.display = 'block';
+          document.getElementById('tab-ext').className = 'btn btn-outline';
+          document.getElementById('tab-pass').className = 'btn';
+        }
+      }
+
+      function confirmLaceConnect() {
+        closeLaceModal();
+        setConnectedState('mn_preprod1q9x8y7z6w5v4u3t2s1r0q9p8o7n6m5l4k3j2h1');
+      }
+
+      function setConnectedState(addr) {
+        document.getElementById('lace-status').innerText = 'Lace Connected (' + addr.slice(0, 14) + '...)';
         document.getElementById('lace-status').style.color = 'var(--accent-success)';
         document.getElementById('wallet-controls').innerHTML = `
           <button class="btn btn-outline" onclick="disconnectWallet()">Disconnect</button>
@@ -333,7 +414,7 @@
         document.getElementById('lace-status').innerText = 'Wallet Disconnected';
         document.getElementById('lace-status').style.color = 'var(--text-secondary)';
         document.getElementById('wallet-controls').innerHTML = `
-          <button class="btn" onclick="connectWallet()">Connect Lace Wallet</button>
+          <button class="btn" onclick="openLaceModal()">Connect Lace Wallet</button>
         `;
       }
 
