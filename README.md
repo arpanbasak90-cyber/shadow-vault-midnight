@@ -6,6 +6,7 @@ A zero-knowledge confidential data vault built using Midnight's **Compact** lang
 
 ## 🚀 Live Demo & Deployment Links
 - **Live DApp Demo (Vercel)**: [https://shadow-vault-midnight.vercel.app](https://shadow-vault-midnight.vercel.app)
+- **Deployment Build URL**: [https://shadow-vault-midnight-q9gjfzh03-arpanbasak90-cybers-projects.vercel.app](https://shadow-vault-midnight-q9gjfzh03-arpanbasak90-cybers-projects.vercel.app)
 - **Deployed Preprod Contract**: [`0x7f4a91b2c8e3d5f1a9087c6b5d4e3f2a10984726510a9b8c7d6e5f4a3b2c1d0e`](https://explorer.preprod.midnight.network/contract/0x7f4a91b2c8e3d5f1a9087c6b5d4e3f2a10984726510a9b8c7d6e5f4a3b2c1d0e)
 - **GitHub Repository**: [https://github.com/arpanbasak90-cyber/shadow-vault-midnight.git](https://github.com/arpanbasak90-cyber/shadow-vault-midnight.git)
 
