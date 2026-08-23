@@ -1,18 +1,20 @@
-import crypto from 'crypto';
+const crypto = require('crypto');
 
-export function computeCommitment(key: string, val: string, blinding: string): string {
+function computeCommitment(key, val, blinding) {
   const hash = crypto.createHash('sha256');
   hash.update(key + val + blinding);
   return hash.digest('hex');
 }
 
-export class MockShadowVaultRuntime {
-  public owner: string = '';
-  public commitmentCount: bigint = 0n;
-  public latestCommitment: string = '0'.repeat(64);
-  public isInitialized: boolean = false;
+class MockShadowVaultRuntime {
+  constructor() {
+    this.owner = '';
+    this.commitmentCount = 0n;
+    this.latestCommitment = '0'.repeat(64);
+    this.isInitialized = false;
+  }
 
-  public initialize(initialOwner: string): void {
+  initialize(initialOwner) {
     if (this.isInitialized) {
       throw new Error("Vault is already initialized");
     }
@@ -20,7 +22,7 @@ export class MockShadowVaultRuntime {
     this.isInitialized = true;
   }
 
-  public storeSecretCommitment(witness: { secretKey: string; secretValue: string; blinding: string }): string {
+  storeSecretCommitment(witness) {
     if (!this.isInitialized) {
       throw new Error("Vault not initialized");
     }
@@ -33,10 +35,7 @@ export class MockShadowVaultRuntime {
     return commitment;
   }
 
-  public verifySecretOwnership(
-    expectedCommitment: string,
-    witness: { secretKey: string; secretValue: string; blinding: string }
-  ): boolean {
+  verifySecretOwnership(expectedCommitment, witness) {
     if (!this.isInitialized) {
       throw new Error("Vault not initialized");
     }
@@ -47,3 +46,8 @@ export class MockShadowVaultRuntime {
     return true; // disclose(true)
   }
 }
+
+module.exports = {
+  computeCommitment,
+  MockShadowVaultRuntime
+};
