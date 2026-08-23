@@ -41,7 +41,7 @@ In Compact smart contracts on Midnight, privacy is the fundamental default:
 
 1. **Clone the Repository:**
    ```bash
-   git clone https://github.com/your-username/shadow-vault-midnight.git
+   git clone https://github.com/arpanbasak90-cyber/shadow-vault-midnight.git
    cd shadow-vault-midnight
    ```
 
