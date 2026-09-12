@@ -1,4 +1,4 @@
-const { computeCommitment, ShadowVaultLocalRuntime } = require('../src/tests/shadow_vault.test');
+import { computeCommitment, ShadowVaultLocalRuntime } from '../src/tests/shadow_vault.test.js';
 
 console.log("==================================================================");
 console.log("⚡ MIDNIGHT SHADOW VAULT COMPACT SMART CONTRACT TEST SUITE");

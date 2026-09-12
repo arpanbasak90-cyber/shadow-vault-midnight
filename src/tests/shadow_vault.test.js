@@ -1,10 +1,10 @@
-const crypto = require('crypto');
+import crypto from 'node:crypto';
 
 /**
  * Pure helper function implementing the exact commitment formula used by ShadowVault.compact:
  * compute_commitment(key, val, blinding) = sha256(key + val + blinding)
  */
-function computeCommitment(key, val, blinding) {
+export function computeCommitment(key, val, blinding) {
   if (typeof key !== 'string' || typeof val !== 'string' || typeof blinding !== 'string') {
     throw new Error("Invalid witness parameter types");
   }
@@ -18,7 +18,7 @@ function computeCommitment(key, val, blinding) {
  * Faithfully mirrors the state variables, assertions, and circuit semantics defined in
  * src/contract/shadow_vault.compact.
  */
-class ShadowVaultLocalRuntime {
+export class ShadowVaultLocalRuntime {
   constructor() {
     this.owner = '';
     this.commitmentCount = 0n;
@@ -81,8 +81,4 @@ class ShadowVaultLocalRuntime {
   }
 }
 
-module.exports = {
-  computeCommitment,
-  ShadowVaultLocalRuntime
-};
 
