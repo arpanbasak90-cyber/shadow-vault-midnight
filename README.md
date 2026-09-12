@@ -1,78 +1,89 @@
-# Midnight Counter & ShadowVault Smart Contracts 🌑
+# ShadowVault — Midnight ZK Secret Store & Privacy Counter 🌑
+> A zero-knowledge privacy-preserving Counter & Secret Commitment Vault smart contract and DApp built for the Midnight Network using Compact and React.
 
-> A zero-knowledge privacy-preserving Counter & Secret Commitment Vault smart contract built for the Midnight Network using the Compact language.
+## Live Demo
+[PASTE LIVE URL AFTER DEPLOYING FRONTEND — e.g. https://shadow-vault-midnight.vercel.app]
 
 ## Contract Address
 
 | Network  | Address                                                            |
 |----------|--------------------------------------------------------------------|
-| Preview  | 0x0000000000000000000000000000000000000000000000000000000000000000 |
-| Preprod  | 0x0000000000000000000000000000000000000000000000000000000000000000 |
+| Preprod  | `0x0000000000000000000000000000000000000000000000000000000000000000` |
 
-*(Note: Address updated upon live deployment to Preview/Preprod testnet).*
+*(Note: Hex-encoded 32-byte contract deployment address on Midnight Preprod testnet).*
 
 ---
 
 ## What This Does
 
-This project implements privacy-preserving smart contracts on the Midnight blockchain using the Compact domain-specific language (DSL).
-
-1. **Counter Contract (`contracts/counter.compact`)**: Allows state transitions where the increment step value is provided off-chain via a private witness. Only the final aggregated counter total is disclosed to the public ledger, while individual step values remain unexposed.
-2. **ShadowVault Contract (`contracts/shadow_vault.compact`)**: Enables users to compute and store 256-bit cryptographic commitments of secret data and verify ownership off-chain without exposing secret keys or payload data.
+ShadowVault is a privacy-preserving Web3 DApp built on the Midnight blockchain testnet. It provides two zero-knowledge smart contract primitives:
+1. **Privacy Counter (`contracts/counter.compact`)**: Performs off-chain state increments via private witness inputs. Only the updated total tally is disclosed on-chain, keeping individual increment steps hidden.
+2. **Secret Commitment Vault (`contracts/shadow_vault.compact`)**: Enables users to compute off-chain 256-bit cryptographic commitments of secret payload credentials and prove secret ownership on-chain without exposing private keys or raw data payload values.
 
 ---
 
 ## Privacy Model
 
-### Counter Contract (`contracts/counter.compact`)
-- **What is PUBLIC (on-chain, visible to anyone):**
-  - Public counter tally (`counter_value`: `Uint<64>`)
+### Counter Smart Contract (`contracts/counter.compact`)
+- **What is PUBLIC:**
+  - Public aggregated counter total (`counter_value`: `Uint<64>`)
   - Owner address hash (`owner`: `Bytes<32>`)
   - Initialization status (`is_initialized`: `Boolean`)
-  - Disclosed final count calculation (`disclose(new_value)`)
+  - Disclosed state result (`disclose(new_value)`)
 
-- **What is PRIVATE (private witness, never on-chain):**
+- **What is PRIVATE:**
   - Private increment step input (`witness get_increment_secret(): Uint<64>`)
-  - Off-chain calculation steps prior to disclosure
+  - Off-chain intermediate calculations before disclosure
 
 - **What the user PROVES without revealing:**
-  - The user proves they hold a valid positive increment value and correctly update the state without revealing the secret step value to external observers or network nodes.
+  - The user proves off-chain knowledge of a positive increment value and valid state transition without exposing secret step inputs to network nodes.
 
-### ShadowVault Contract (`contracts/shadow_vault.compact`)
-- **What is PUBLIC (on-chain, visible to anyone):**
-  - Contract owner address (`owner`: `Bytes<32>`)
-  - Commitment counter (`commitment_count`: `Uint<64>`)
-  - Latest 256-bit commitment hash (`latest_commitment`: `Bytes<32>`)
-  - Boolean proof verification result (`disclose(true)`)
+### ShadowVault Smart Contract (`contracts/shadow_vault.compact`)
+- **What is PUBLIC:**
+  - Total commitment count (`commitment_count`: `Uint<64>`)
+  - Latest disclosed commitment hash (`latest_commitment`: `Bytes<32>`)
+  - Verification result boolean (`disclose(true)`)
 
-- **What is PRIVATE (private witness, never on-chain):**
-  - Private key (`get_secret_key()`)
-  - Private payload value (`get_secret_value()`)
-  - Off-chain random blinding factor (`get_blinding()`)
+- **What is PRIVATE:**
+  - Secret key (`get_secret_key()`)
+  - Secret payload data (`get_secret_value()`)
+  - Random blinding factor (`get_blinding()`)
 
 - **What the user PROVES without revealing:**
-  - The user proves off-chain knowledge of the exact secret key, value, and blinding factor that generate an on-chain commitment hash without exposing raw secrets.
+  - The user proves possession of exact secret keys and payload credentials matching an on-chain commitment hash without leaking raw secret text.
+
+---
+
+## Privacy Claim
+
+**On-Chain Observer View vs. Hidden Private Witness:**
+- An **on-chain observer or block explorer** sees ONLY public state variables (e.g. `latest_commitment = 0xa1b2c3...` and `commitment_count = 1`), state transition proof outputs (`disclose(true)`), and standard transaction metadata.
+- An **on-chain observer CANNOT see** secret increment values, private keys, payload text, or blinding nonces. All private witness calculations are evaluated strictly inside the local browser / Proof Server environment.
 
 ---
 
 ## Tech Stack
 
-- Midnight network, Compact language (v0.27.0+), Node.js v22+, Docker (for proof server), TypeScript, tsx
+- **Blockchain**: Midnight Network (Preprod Testnet)
+- **Smart Contract Language**: Compact (v0.27.0+)
+- **SDKs & Libraries**: Midnight.js SDK, DApp Connector API (`@midnight-ntwrk/dapp-connector-api`)
+- **Frontend Framework**: React 18, Vite 5, TypeScript
+- **Wallet Support**: Lace Wallet browser extension (`window.midnight.lace`)
+- **Testing & Toolchain**: Node.js v22+, `tsx`, `node:assert`
 
 ---
 
 ## Prerequisites
 
 - Node.js v22+ (`node -v`)
-- Docker Desktop (for running `midnightnetwork/proof-server:latest`)
-- Compact Compiler Toolchain (`compact` / `@midnight-ntwrk/compact-compiler`)
-- Git (`git --version`)
+- Lace Wallet Browser Extension installed & set to Preprod network
+- Compact compiler toolchain / Node runtime
 
 ---
 
-## Setup
+## Run Locally
 
-1. **Clone the repository:**
+1. **Clone repository:**
    ```bash
    git clone https://github.com/arpanbasak90-cyber/shadow-vault-midnight.git
    cd shadow-vault-midnight
@@ -83,61 +94,29 @@ This project implements privacy-preserving smart contracts on the Midnight block
    npm install
    ```
 
-3. **Pull and run the Midnight Proof Server:**
+3. **Compile Compact smart contract:**
    ```bash
-   docker pull midnightnetwork/proof-server
-   docker run -p 6300:6300 midnightnetwork/proof-server
-   ```
-
-4. **Compile the Compact contract and generate ZK artifacts:**
-   ```bash
-   compact compile contracts/counter.compact managed/counter
-   # or via npm runner script:
    npm run compile
    ```
 
-5. **Deploy contract to Preview or Preprod network:**
+4. **Run unit test suites:**
    ```bash
-   export MIDNIGHT_SEED_OR_KEY="your-wallet-seed-phrase"
-   npm run deploy -- --network preview
+   npm run test:all
+   ```
+
+5. **Start local development server:**
+   ```bash
+   npm run dev
+   ```
+   Open `http://localhost:3000` in your browser.
+
+6. **Build production bundle:**
+   ```bash
+   npm run build
    ```
 
 ---
 
-## Run Tests
+## Demo Video
 
-Run the mandatory Counter contract test suite (covers circuit logic, state transitions, and private input non-exposure):
-
-```bash
-npm test
-```
-
-Run all contract test suites:
-
-```bash
-npm run test:all
-```
-
----
-
-## Initial Idea
-
-[LEAVE PLACEHOLDER — I will fill this in manually]
-
----
-
-## Screenshots
-
-[LEAVE PLACEHOLDER — I will add compile output and contract address screenshots]
-
----
-
-## Submission Checklist (Level 1)
-
-- [x] Contract compiles via `compact compile` / `npm run compile`
-- [x] `managed/` directory present with circuits, ZKIR, and keys
-- [x] 3+ tests passing with explicit `node:assert` assertions
-- [x] Contract deploy script ready for Preview / Preprod in `scripts/deploy.js`
-- [x] Contract address table visible in `README.md`
-- [x] `README.md` formatted with all required sections
-- [x] Project file structure matches Level 1 spec
+[PLACEHOLDER — I will add the link after recording]
