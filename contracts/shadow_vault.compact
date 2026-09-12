@@ -1,0 +1,96 @@
+// Compact Smart Contract: ShadowVault
+// Language: Compact (Midnight Network DSL)
+// Version constraint: compact >= 0.27.0;
+
+pragma language_version >= 0.27.0;
+
+module ShadowVault {
+    // =========================================================================
+    // PUBLIC LEDGER STATE
+    // Data stored on-chain in the global ledger, visible to all network nodes.
+    // =========================================================================
+    export ledger owner: Bytes<32>;
+    export ledger commitment_count: Uint<64>;
+    export ledger latest_commitment: Bytes<32>;
+    export ledger is_initialized: Boolean;
+
+    // =========================================================================
+    // PRIVATE WITNESS INTERFACE
+    // Private input declarations supplied off-chain during ZK proof generation.
+    // =========================================================================
+    witness get_secret_key(): Bytes<32>;
+    witness get_secret_value(): Bytes<32>;
+    witness get_blinding(): Bytes<32>;
+
+    // Pure helper to calculate secret commitment: Hash(key || payload || blinding)
+    pure function compute_commitment(
+        key: Bytes<32>,
+        val: Bytes<32>,
+        blinding: Bytes<32>
+    ): Bytes<32> {
+        return sha256(key + val + blinding);
+    }
+
+    // =========================================================================
+    // CONSTRUCTOR & INITIALIZATION
+    // =========================================================================
+    export circuit initialize(initial_owner: Bytes<32>): Void {
+        assert !is_initialized "Vault is already initialized";
+        
+        owner = initial_owner;
+        commitment_count = 0u64;
+        latest_commitment = 0x0000000000000000000000000000000000000000000000000000000000000000;
+        is_initialized = true;
+    }
+
+    // =========================================================================
+    // TRANSITIONAL CIRCUITS (PUBLIC/PRIVATE STATE BOUNDARY)
+    // =========================================================================
+    
+    /**
+     * Store a new encrypted commitment.
+     * Takes private witness data, computes the ZK commitment, and updates public ledger.
+     */
+    export circuit store_secret_commitment(): Bytes<32> {
+        assert is_initialized "Vault not initialized";
+
+        // Obtain private inputs from off-chain witness
+        let key = get_secret_key();
+        let val = get_secret_value();
+        let blinding = get_blinding();
+
+        // Calculate commitment in ZK circuit context
+        let commitment = compute_commitment(key, val, blinding);
+
+        // DELIBERATE DISCLOSURE:
+        // Disclose ONLY the calculated commitment hash to update public state.
+        // Raw key, payload, and blinding remain 100% private in the witness!
+        let public_commitment = disclose(commitment);
+
+        // Update public ledger state
+        latest_commitment = public_commitment;
+        commitment_count = commitment_count + 1u64;
+
+        return public_commitment;
+    }
+
+    /**
+     * Verify secret ownership without revealing the secret itself.
+     * Proves off-chain knowledge of key, value, and blinding that matches expected_commitment.
+     */
+    export circuit verify_secret_ownership(expected_commitment: Bytes<32>): Boolean {
+        assert is_initialized "Vault not initialized";
+
+        let key = get_secret_key();
+        let val = get_secret_value();
+        let blinding = get_blinding();
+
+        let calculated_commitment = compute_commitment(key, val, blinding);
+
+        // Zero-knowledge constraint check
+        assert calculated_commitment == expected_commitment "Commitment verification failed";
+
+        // Return public boolean result of ZK proof execution
+        return disclose(true);
+    }
+}

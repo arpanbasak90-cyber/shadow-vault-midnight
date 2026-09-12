@@ -1,0 +1,40 @@
+// Compact Smart Contract: Counter
+// Language: Compact (Midnight Network DSL)
+// Version constraint: compact >= 0.27.0;
+
+pragma language_version >= 0.27.0;
+
+module Counter {
+    // =========================================================================
+    // PUBLIC LEDGER STATE
+    // Data stored on-chain in the global ledger, visible to all network nodes.
+    // =========================================================================
+    export ledger counter_value: Uint<64>;
+    export ledger owner: Bytes<32>;
+    export ledger is_initialized: Boolean;
+
+    // =========================================================================
+    // PRIVATE WITNESS INTERFACE
+    // Private input declarations supplied off-chain during ZK proof generation.
+    // =========================================================================
+    witness get_increment_secret(): Uint<64>;
+
+    // =========================================================================
+    // CIRCUITS
+    // =========================================================================
+    export circuit initialize(initial_owner: Bytes<32>): Void {
+        assert !is_initialized "Counter is already initialized";
+        owner = initial_owner;
+        counter_value = 0u64;
+        is_initialized = true;
+    }
+
+    export circuit increment(): Uint<64> {
+        assert is_initialized "Counter not initialized";
+        let secret_step = get_increment_secret();
+        // Disclose only the updated count, keeping increment step private if needed
+        let new_value = counter_value + secret_step;
+        counter_value = disclose(new_value);
+        return counter_value;
+    }
+}

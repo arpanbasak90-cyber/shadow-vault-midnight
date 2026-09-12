@@ -1,78 +1,67 @@
-# ShadowVault — Confidential Credentials & ZK Eligibility Verifier 🌑
+# ShadowVault — Privacy-Preserving Key-Value Store & Secret Commitment Vault 🌑
 
-![CI/CD Build Status](https://github.com/arpanbasak90-cyber/shadow-vault-midnight/actions/workflows/ci.yml/badge.svg)
-![Midnight Preprod](https://img.shields.io/badge/Network-Midnight%20Preprod-6366f1)
-![Compact Language](https://img.shields.io/badge/Language-Compact%20v0.27.0-06b6d4)
+> A zero-knowledge confidential data vault and credential eligibility verifier smart contract built for Midnight Network using the Compact language and TypeScript SDK.
 
-A production-grade, zero-knowledge confidential data vault and eligibility verification DApp built for **Midnight Network Level 3 — First Quarter** using the **Compact** smart contract language and **Midnight.js SDK**.
+## Contract Address
 
----
+| Network  | Address                                                            |
+|----------|--------------------------------------------------------------------|
+| Preview  | 0x0000000000000000000000000000000000000000000000000000000000000000 |
+| Preprod  | 0x0000000000000000000000000000000000000000000000000000000000000000 |
 
-## 🚀 Live Demo & Production Links
-- **Live Vercel DApp**: [https://shadow-vault-midnight.vercel.app](https://shadow-vault-midnight.vercel.app)
-- **Deployed Preprod Contract Address**: [`0x7f4a91b2c8e3d5f1a9087c6b5d4e3f2a10984726510a9b8c7d6e5f4a3b2c1d0e`](https://explorer.midnight.network)
-- **GitHub Repository**: [https://github.com/arpanbasak90-cyber/shadow-vault-midnight.git](https://github.com/arpanbasak90-cyber/shadow-vault-midnight.git)
+*(Note: Replace placeholder address with live transaction address once deployed via wallet seed.)*
 
 ---
 
-## 💡 Level 3 Product Proposal: Confidential Credentials & Age / Eligibility Gate
+## What This Does
 
-### Selected Problem (From Official Idea List):
-> **Confidential Credentials & Age / Eligibility Gate** — *Prove a credential is valid or prove a threshold without revealing the underlying private value.*
-
-### Product Vision & Real-World Use Case:
-In real-world compliance (KYC/AML, age gating, investor accreditation, private access pass), users are currently forced to reveal raw personal documents (passport, birth year, bank statement) to centralized servers. 
-
-**ShadowVault** solves this by providing a zero-knowledge credential verification protocol:
-1. **Off-Chain Private Credentials**: Users keep their private credentials (`birth_year`, `accreditation_income`, `secret_passcode`) strictly inside local witness memory.
-2. **Selective Disclosure**: Zero-knowledge circuits verify eligibility constraints (e.g. `age >= 21` or `commitment == target_hash`) off-chain.
-3. **Ledger Disclosures**: Only the boolean result or commitment hash (`disclose()`) is published to Midnight Preprod. Third-party auditors can verify compliance without ever seeing the user's underlying private data.
+ShadowVault allows users to store cryptographic commitments of confidential credentials (keys, secret values, and random blinding factors) on the Midnight blockchain. It enables users to prove ownership or eligibility of a private credential off-chain without revealing the raw secret key, payload data, or blinding nonce on the public ledger.
 
 ---
 
-## 🛡️ Privacy Model: What an Observer CAN and CANNOT Learn
+## Privacy Model
 
-| Observer Domain | What an Observer **CAN** Learn 🌐 | What an Observer **CANNOT** Learn 🔒 |
-| :--- | :--- | :--- |
-| **On-Chain Public Ledger** | • Public contract address (`0x7f4a...1d0e`) | ❌ User's raw `secretKey` or identity |
-| | • Public owner public key (`owner`) | ❌ User's raw `secretValue` or payload |
-| | • Total commitments count (`commitment_count`) | ❌ User's private blinding factor nonce |
-| | • 256-bit disclosed commitment hash (`disclose(hash)`) | ❌ Exact age, birth year, or credential value |
-| | • Boolean verification proof output (`true`/`false`) | ❌ Any intermediate circuit witness variables |
+- **What is PUBLIC (on-chain, visible to anyone):**
+  - Contract owner address (`owner`: `Bytes<32>`)
+  - Incremental count of stored commitments (`commitment_count`: `Uint<64>`)
+  - Disclosed 256-bit SHA256 commitment hash (`latest_commitment`: `Bytes<32>`)
+  - Initialization status (`is_initialized`: `Boolean`)
+  - Boolean ZK proof execution output (`disclose(true)`)
 
----
+- **What is PRIVATE (private witness, never on-chain):**
+  - Private credential key (`get_secret_key()`)
+  - Private secret payload value (`get_secret_value()`)
+  - Off-chain random blinding factor (`get_blinding()`)
+  - Intermediate circuit calculation inputs
 
-## 🧪 Automated Test Suite (9 Passing Tests)
-
-ShadowVault includes a 100% automated test suite validating contract initialization, ZK witness hashing, `disclose()` state boundaries, and constraint rejections:
-
-![Automated Test Suite Output](artifacts/screenshots/test_output.png)
-
-To execute tests locally:
-```bash
-npm test
-```
+- **What the user PROVES without revealing:**
+  - The user proves off-chain knowledge of the exact `secretKey`, `secretValue`, and `blinding` factor that produces a specific on-chain commitment hash, without ever revealing the underlying secret key or value to any node or observer.
 
 ---
 
-## ⚙️ CI/CD Pipeline (GitHub Actions)
+## Tech Stack
 
-Every commit and pull request to the `main` branch automatically triggers our GitHub Actions pipeline ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)):
-1. Checks out repository on Node.js `22.x` environment.
-2. Installs dependencies (`npm install`).
-3. Compiles Compact smart contract & generates ZK circuits (`npm run build:contract`).
-4. Runs full 9-point test suite (`npm test`).
-5. Verifies Preprod network deployment script syntax.
+- **Blockchain Platform:** Midnight Network (Preview / Preprod)
+- **Smart Contract Language:** Compact (v0.27.0+)
+- **Runtime & Environment:** Node.js v22+, Docker (for proof server)
+- **Frontend & Toolchain:** TypeScript, Vite, React, tsx
 
 ---
 
-## 📱 DApp Screenshots
+## Prerequisites
 
-![ShadowVault Clean Interface](artifacts/screenshots/dapp_interface.png)
+Before running this project locally, ensure you have the following installed:
+
+1. **Node.js v22+** (`node -v`)
+2. **Docker Desktop** (for running `midnightnetwork/proof-server:latest`)
+3. **Compact Compiler Toolchain** (`@midnight-ntwrk/compact-compiler` or `compact`)
+4. **Git** (`git --version`)
 
 ---
 
-## 🛠️ Local Development Setup
+## Setup
+
+Follow these steps to set up and build the project locally:
 
 1. **Clone the Repository:**
    ```bash
@@ -85,47 +74,58 @@ Every commit and pull request to the `main` branch automatically triggers our Gi
    npm install
    ```
 
-3. **Compile Compact Contract & Generate ZK Circuits (`managed/`):**
+3. **Start the Midnight Proof Server (Docker):**
    ```bash
-   npm run build:contract
+   docker run -p 6300:6300 midnightnetwork/proof-server:latest
    ```
 
-4. **Execute Automated Test Suite:**
+4. **Verify Compact Compiler & Build ZK Artifacts:**
    ```bash
-   npm test
+   npm run compile
    ```
+   *Generated ZK circuit artifacts will be output to `managed/shadow_vault/` and `managed/counter/`.*
 
-5. **Deploy Contract to Preprod Network:**
+5. **Deploy to Preview / Preprod Network:**
    ```bash
-   npm run deploy:preprod
+   export MIDNIGHT_SEED_OR_KEY="your-wallet-seed-phrase"
+   npm run deploy
    ```
 
 ---
 
-## 📁 Repository Structure
+## Run Tests
 
-```text
-shadow-vault-midnight/
-├── .github/
-│   └── workflows/
-│       └── ci.yml                    # GitHub Actions CI/CD Pipeline
-├── src/
-│   ├── contract/
-│   │   └── shadow_vault.compact      # Main Compact Smart Contract
-│   └── tests/
-│       └── shadow_vault.test.js      # 9-point Automated Test Suite
-├── managed/                          # Auto-generated ZK circuits, keys & bindings
-│   └── shadow_vault/
-│       ├── shadow_vault.zkir
-│       ├── shadow_vault.pk
-│       └── shadow_vault.vk
-├── artifacts/
-│   └── screenshots/
-│       ├── compile_output.png
-│       ├── deployment_output.png
-│       ├── dapp_interface.png
-│       └── test_output.png
-├── index.html                        # Clean DApp Frontend with Light/Dark Theme
-├── package.json
-└── README.md
+Run the complete automated Compact contract test suite covering circuit logic, state transitions, and private witness protection:
+
+```bash
+npm test
 ```
+
+To run the secondary Counter contract test suite:
+```bash
+npm run test:counter
+```
+
+---
+
+## Initial Idea
+
+[LEAVE PLACEHOLDER — I will fill this in manually]
+
+---
+
+## Screenshots
+
+[LEAVE PLACEHOLDER — I will add compile output and contract address screenshots]
+
+---
+
+## Submission & Requirements Checklist
+
+- [x] Contract compiles via `compact compile` / `npm run compile`
+- [x] Generated `managed/` directory present with valid ZK circuits (`.zkir`) and keys (`.pk`, `.vk`, `index.ts`)
+- [x] 3+ tests passing with explicit assertions in `tests/shadow_vault.test.ts` & `tests/counter.test.ts`
+- [x] Contract deployment setup ready for Preview / Preprod in `scripts/deploy.js`
+- [x] Contract address table visible in `README.md`
+- [x] `README.md` formatted with all required sections
+- [x] Standard folder structure matching Level 1 spec (`contracts/`, `managed/`, `tests/`, `.github/`, `README.md`)

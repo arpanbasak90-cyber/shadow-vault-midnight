@@ -224,12 +224,12 @@
       <!-- On-Chain Smart Contract Details -->
       <div class="card" style="display: flex; justify-content: space-between; align-items: center;">
         <div>
-          <div style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase;">Deployed Compact Smart Contract Address</div>
-          <div class="mono" style="font-size: 0.85rem; margin-top: 4px; color: var(--accent-primary);">
-            0x7f4a91b2c8e3d5f1a9087c6b5d4e3f2a10984726510a9b8c7d6e5f4a3b2c1d0e
+          <div style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase;">Midnight Preprod Network Status</div>
+          <div class="mono" style="font-size: 0.85rem; margin-top: 4px; color: var(--badge-text);">
+            Deployment Ready (Awaiting wallet credentials run via <code>MIDNIGHT_SEED_OR_KEY</code>)
           </div>
         </div>
-        <button class="btn btn-outline" onclick="openExplorerModal()" style="font-size: 0.85rem;">View Explorer ↗</button>
+        <button class="btn btn-outline" onclick="openExplorerModal()" style="font-size: 0.85rem;">Network Info ↗</button>
       </div>
 
       <!-- Two Column Circuit Forms -->
@@ -268,7 +268,7 @@
 
           <form onsubmit="handleVerify(event)">
             <label>Target On-Chain Commitment Hash:</label>
-            <input type="text" id="targetHash" class="mono" value="0x7f4a91b2c8e3d5f1a9087c6b5d4e3f2a10984726510a9b8c7d6e5f4a3b2c1d0e" required />
+            <input type="text" id="targetHash" class="mono" placeholder="Paste commitment hash (e.g. 0x...)" required />
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
               <div>
@@ -310,8 +310,8 @@
           <div style="padding: 16px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--input-bg);">
             <strong style="color: var(--accent-success); font-size: 0.9rem;">🌐 Public Ledger (On-Chain)</strong>
             <ul style="font-size: 0.85rem; color: var(--text-secondary); margin-left: 18px; margin-top: 8px; line-height: 1.7;">
-              <li>Total Commitments Count: <span id="commit-count">1</span></li>
-              <li>Latest Disclosed Hash: <span id="latest-hash" class="mono">0x7f4a91...</span></li>
+              <li>Total Commitments Count: <span id="commit-count">0</span></li>
+              <li>Latest Disclosed Hash: <span id="latest-hash" class="mono">None</span></li>
               <li>Only <code>disclose(commitment)</code> is public</li>
             </ul>
           </div>
@@ -332,9 +332,9 @@
         </div>
 
         <div style="padding: 16px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 16px;">
-          <div style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase;">Contract Address</div>
+          <div style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase;">Network Explorer</div>
           <div class="mono" style="font-size: 0.85rem; color: var(--accent-primary); margin-top: 4px; word-break: break-all;">
-            0x7f4a91b2c8e3d5f1a9087c6b5d4e3f2a10984726510a9b8c7d6e5f4a3b2c1d0e
+            https://explorer.midnight.network
           </div>
         </div>
 
@@ -345,13 +345,13 @@
           </div>
           <div style="padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
             <div style="font-size: 0.75rem; color: var(--text-secondary);">Deployment Status</div>
-            <strong style="font-size: 0.9rem; color: var(--accent-success);">✓ Confirmed (Block #148291)</strong>
+            <strong style="font-size: 0.9rem; color: var(--badge-text);">Deployment Ready</strong>
           </div>
         </div>
 
         <div style="padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 16px;">
-          <div style="font-size: 0.75rem; color: var(--text-secondary);">Deployment Transaction Hash</div>
-          <div class="mono" style="font-size: 0.8rem; margin-top: 2px;">0xa1b2c3d4e5f67890123456789abcdef0123456789abcdef0123456789abcdef0</div>
+          <div style="font-size: 0.75rem; color: var(--text-secondary);">Deployment Instructions</div>
+          <div class="mono" style="font-size: 0.8rem; margin-top: 2px;">MIDNIGHT_SEED_OR_KEY="&lt;seed&gt;" npm run deploy:preprod</div>
         </div>
 
         <button class="btn" style="width: 100%;" onclick="closeExplorerModal()">Return to DApp</button>

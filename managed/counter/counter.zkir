@@ -1,0 +1,22 @@
+{
+  "contract": "Counter",
+  "version": "0.27.0",
+  "circuits": {
+    "initialize": {
+      "inputs": [
+        "Bytes<32>"
+      ],
+      "outputs": [],
+      "constraints": 96
+    },
+    "increment": {
+      "inputs": [
+        "witness:secret_step"
+      ],
+      "outputs": [
+        "disclose:Uint<64>"
+      ],
+      "constraints": 412
+    }
+  }
+}
