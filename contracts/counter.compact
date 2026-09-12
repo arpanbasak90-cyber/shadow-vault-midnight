@@ -4,10 +4,29 @@
 
 pragma language_version >= 0.27.0;
 
+/**
+ * =============================================================================
+ * COUNTER SMART CONTRACT - PRIVACY MODEL & BOUNDARIES
+ * =============================================================================
+ * 
+ * PUBLIC LEDGER STATE (On-chain, globally visible to all nodes):
+ *   - counter_value: Uint<64> - Current public counter tally.
+ *   - owner: Bytes<32> - Public key hash of the contract owner.
+ *   - is_initialized: Boolean - Status flag tracking whether contract is initialized.
+ * 
+ * PRIVATE WITNESS INPUTS (Off-chain, zero-knowledge context):
+ *   - witness get_increment_secret(): Uint<64> - Private increment step value.
+ *     Supplied off-chain during ZK proof generation.
+ * 
+ * DELIBERATE DISCLOSURE BOUNDARY:
+ *   - disclose(new_value): Only the calculated new total is disclosed on-chain.
+ *     The raw secret increment step value is NEVER stored or exposed on-chain.
+ * =============================================================================
+ */
+
 module Counter {
     // =========================================================================
     // PUBLIC LEDGER STATE
-    // Data stored on-chain in the global ledger, visible to all network nodes.
     // =========================================================================
     export ledger counter_value: Uint<64>;
     export ledger owner: Bytes<32>;
@@ -15,7 +34,6 @@ module Counter {
 
     // =========================================================================
     // PRIVATE WITNESS INTERFACE
-    // Private input declarations supplied off-chain during ZK proof generation.
     // =========================================================================
     witness get_increment_secret(): Uint<64>;
 
@@ -32,8 +50,9 @@ module Counter {
     export circuit increment(): Uint<64> {
         assert is_initialized "Counter not initialized";
         let secret_step = get_increment_secret();
-        // Disclose only the updated count, keeping increment step private if needed
+        // Calculate new state using private witness step
         let new_value = counter_value + secret_step;
+        // DELIBERATE DISCLOSURE: Disclose only the final new counter value on-chain
         counter_value = disclose(new_value);
         return counter_value;
     }

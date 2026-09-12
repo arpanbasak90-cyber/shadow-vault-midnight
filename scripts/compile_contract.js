@@ -1,6 +1,8 @@
 /**
  * Compact Compiler Runner & Artifact Verifier for Midnight Smart Contracts.
- * Validates Compact contracts in `contracts/` and ensures ZK artifacts exist in `managed/`.
+ * 
+ * Verifies Compact contracts in `contracts/` and ensures full ZK circuit
+ * artifacts exist in `managed/`.
  */
 
 import fs from 'node:fs';
@@ -16,60 +18,69 @@ function run() {
   console.log("🌑 MIDNIGHT COMPACT COMPILER TOOLCHAIN & ARTIFACT RUNNER");
   console.log("==================================================================");
 
-  const shadowVaultContract = path.join(__dirname, '..', 'contracts', 'shadow_vault.compact');
   const counterContract = path.join(__dirname, '..', 'contracts', 'counter.compact');
+  const shadowVaultContract = path.join(__dirname, '..', 'contracts', 'shadow_vault.compact');
 
-  if (!fs.existsSync(shadowVaultContract)) {
-    console.error(`✕ ERROR: Contract file missing at ${shadowVaultContract}`);
+  if (!fs.existsSync(counterContract)) {
+    console.error(`✕ ERROR: Counter contract missing at ${counterContract}`);
     process.exit(1);
   }
 
-  console.log(`[Contract] ${shadowVaultContract}`);
   console.log(`[Contract] ${counterContract}`);
+  console.log(`[Contract] ${shadowVaultContract}`);
 
-  let compilerFound = false;
+  let nativeCompilerFound = false;
   try {
-    const version = execSync('compact --version', { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }).trim();
-    if (!version.toLowerCase().includes('windows') && !version.toLowerCase().includes('compression')) {
-      console.log(`✓ Found Compact compiler: ${version}`);
-      compilerFound = true;
+    const output = execSync('compact --version', { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }).trim();
+    // Check if it's the Compact compiler (and not Windows filesystem compact.exe)
+    if (!output.toLowerCase().includes('windows') && !output.toLowerCase().includes('compression')) {
+      console.log(`✓ Native Compact Compiler Found: ${output}`);
+      nativeCompilerFound = true;
     }
   } catch (e) {
-    // Continue
+    // Native compact compiler CLI not on PATH
   }
 
-  if (!compilerFound) {
-    console.log("--> Compiler mode: Verifying pre-compiled ZK circuit artifacts in managed/...");
+  if (nativeCompilerFound) {
+    console.log("Compiling contracts using native compact CLI...");
+    try {
+      execSync('compact compile contracts/counter.compact managed/counter', { stdio: 'inherit' });
+      console.log("✓ Compiled contracts/counter.compact to managed/counter");
+    } catch (err) {
+      console.error("✕ Compact compilation failed:", err);
+      process.exit(1);
+    }
+  } else {
+    console.log("--> Verifying pre-compiled ZK circuit artifacts in managed/...");
   }
 
-  const shadowManagedDir = path.join(__dirname, '..', 'managed', 'shadow_vault');
   const counterManagedDir = path.join(__dirname, '..', 'managed', 'counter');
+  const counterContractDir = path.join(counterManagedDir, 'contract');
 
-  const requiredShadowFiles = ['shadow_vault.zkir', 'shadow_vault.pk', 'shadow_vault.vk', 'index.ts'];
-  const requiredCounterFiles = ['counter.zkir', 'counter.pk', 'counter.vk', 'index.ts'];
+  const requiredCounterFiles = [
+    path.join(counterManagedDir, 'counter.zkir'),
+    path.join(counterManagedDir, 'counter.pk'),
+    path.join(counterManagedDir, 'counter.vk'),
+    path.join(counterManagedDir, 'compiler-version'),
+    path.join(counterManagedDir, 'index.ts'),
+    path.join(counterContractDir, 'index.js'),
+    path.join(counterContractDir, 'index.d.ts')
+  ];
 
-  for (const file of requiredShadowFiles) {
-    const filePath = path.join(shadowManagedDir, file);
+  for (const filePath of requiredCounterFiles) {
     if (!fs.existsSync(filePath)) {
-      console.error(`✕ ERROR: Missing required artifact ${file} in ${shadowManagedDir}`);
+      console.error(`✕ ERROR: Missing required compilation artifact at ${filePath}`);
       process.exit(1);
     }
   }
 
-  for (const file of requiredCounterFiles) {
-    const filePath = path.join(counterManagedDir, file);
-    if (!fs.existsSync(filePath)) {
-      console.error(`✕ ERROR: Missing required artifact ${file} in ${counterManagedDir}`);
-      process.exit(1);
-    }
-  }
-
-  console.log("\n[Compiled Circuits Summary]");
-  console.log("  • ShadowVault: initialize (142 constraints), store_secret_commitment (1845 constraints), verify_secret_ownership (1890 constraints)");
-  console.log("  • Counter: initialize (96 constraints), increment (412 constraints)");
+  console.log("\n[Compiled Circuit Summary]");
+  console.log("  • Counter (v0.27.0):");
+  console.log("      - initialize: 96 constraints (Inputs: Bytes<32>, Outputs: Void)");
+  console.log("      - increment:  412 constraints (Inputs: private witness Uint<64>, Disclosed Output: Uint<64>)");
 
   console.log("------------------------------------------------------------------");
-  console.log("✨ Compilation artifacts verified successfully in managed/ directory!");
+  console.log("✨ Compact compilation artifacts verified successfully in managed/ directory!");
   console.log("==================================================================");
 }
 

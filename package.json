@@ -2,7 +2,7 @@
   "name": "shadow-vault-midnight",
   "version": "1.0.0",
   "type": "module",
-  "description": "Privacy-Preserving Key-Value Store & Secret Commitment Vault on Midnight Network",
+  "description": "Privacy-Preserving Counter & Secret Commitment Vault on Midnight Network",
   "main": "dist/index.js",
   "scripts": {
     "dev": "vite",
@@ -11,17 +11,20 @@
     "compile": "node scripts/compile_contract.js",
     "compact compile": "node scripts/compile_contract.js",
     "build:contract": "node scripts/compile_contract.js",
-    "test": "npx tsx tests/shadow_vault.test.ts",
+    "test": "npx tsx tests/counter.test.ts",
     "test:counter": "npx tsx tests/counter.test.ts",
+    "test:all": "npx tsx tests/counter.test.ts && npx tsx tests/shadow_vault.test.ts",
     "deploy": "node scripts/deploy.js",
-    "deploy:preprod": "node scripts/deploy.js"
+    "deploy:preview": "node scripts/deploy.js --network preview",
+    "deploy:preprod": "node scripts/deploy.js --network preprod"
   },
   "keywords": [
     "midnight",
     "compact",
     "zk-proofs",
     "privacy",
-    "blockchain"
+    "blockchain",
+    "counter"
   ],
   "author": "Midnight Builder",
   "license": "MIT",

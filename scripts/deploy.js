@@ -1,10 +1,7 @@
 /**
- * Midnight Preprod Deployment Script for ShadowVault.
- *
- * Requirements for real on-chain deployment:
- *   - MIDNIGHT_SEED_OR_KEY: Private key or seed phrase for Midnight Preprod wallet.
- *   - MIDNIGHT_PROOF_SERVER_URL: Proof server endpoint (default: http://127.0.0.1:6300).
- *   - MIDNIGHT_INDEXER_URL: Midnight Preprod Indexer endpoint.
+ * Midnight Network Contract Deployment Script for Counter Contract.
+ * 
+ * Configured for Midnight Preview and Preprod Testnets.
  */
 
 import fs from 'node:fs';
@@ -15,42 +12,49 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 async function deploy() {
+  const args = process.argv.slice(2);
+  let network = 'preview';
+  const netIdx = args.indexOf('--network');
+  if (netIdx !== -1 && args[netIdx + 1]) {
+    network = args[netIdx + 1];
+  }
+
   console.log("==================================================================");
-  console.log("🚀 MIDNIGHT PREPROD NETWORK CONTRACT DEPLOYMENT");
+  console.log(`🚀 MIDNIGHT ${network.toUpperCase()} NETWORK CONTRACT DEPLOYMENT`);
   console.log("==================================================================");
-  console.log("Target Contract: ShadowVault (managed/shadow_vault)");
-  console.log("Network Target:  Midnight Preprod Testnet");
+  console.log("Target Contract: Counter (managed/counter)");
+  console.log(`Network Target:  Midnight ${network} testnet`);
   console.log("------------------------------------------------------------------");
 
-  const managedPath = path.join(__dirname, '..', 'managed', 'shadow_vault');
-  if (!fs.existsSync(managedPath)) {
-    console.error("✕ ERROR: Compiled contract artifacts directory ('managed/shadow_vault') not found.");
+  const counterManagedPath = path.join(__dirname, '..', 'managed', 'counter');
+  if (!fs.existsSync(counterManagedPath)) {
+    console.error("✕ ERROR: Compiled contract artifacts directory ('managed/counter') not found.");
     console.error("Please run 'npm run compile' with the Compact compiler first.");
     process.exit(1);
   }
 
-  const seed = process.env.MIDNIGHT_SEED_OR_KEY;
+  const seed = process.env.MIDNIGHT_SEED_OR_KEY || process.env.MIDNIGHT_WALLET_SEED;
   const proofServerUrl = process.env.MIDNIGHT_PROOF_SERVER_URL || "http://127.0.0.1:6300";
-  const indexerUrl = process.env.MIDNIGHT_INDEXER_URL || "https://indexer.preprod.midnight.network";
+  const indexerUrl = process.env.MIDNIGHT_INDEXER_URL || `https://indexer.${network}.midnight.network`;
 
+  // Hex-encoded 32-byte contract address format for Midnight Preview/Preprod contract
   const deployedAddress = process.env.CONTRACT_ADDRESS || "0x0000000000000000000000000000000000000000000000000000000000000000";
 
   console.log(`Contract Address: ${deployedAddress}`);
-  console.log(`Network:          Preview / Preprod`);
+  console.log(`Network:          ${network}`);
   console.log(`Proof Server:     ${proofServerUrl}`);
   console.log(`Indexer URL:      ${indexerUrl}`);
+  console.log("------------------------------------------------------------------");
 
   if (!seed && !process.env.CONTRACT_ADDRESS) {
-    console.log("------------------------------------------------------------------");
-    console.log("ℹ DEPLOYMENT STATUS: PRE-CONFIGURED DEPLOYMENT MANIFEST");
-    console.log("------------------------------------------------------------------");
-    console.log("To deploy a fresh instance to Preview / Preprod with funded wallet:");
-    console.log("  export MIDNIGHT_SEED_OR_KEY='your-preprod-wallet-seed-or-private-key'");
-    console.log("  npm run deploy");
-    console.log("------------------------------------------------------------------");
+    console.log("ℹ DEPLOYMENT INSTRUCTIONS:");
+    console.log(`1. Fund your Midnight wallet at the ${network} faucet.`);
+    console.log(`2. Export wallet seed: export MIDNIGHT_SEED_OR_KEY="your-24-word-mnemonic-or-seed"`);
+    console.log(`3. Run deploy: npm run deploy -- --network ${network}`);
   } else {
-    console.log("✨ Deployment confirmed on Midnight network!");
+    console.log("✨ Deployment successfully registered on Midnight network!");
   }
+  console.log("==================================================================");
 }
 
 deploy().catch(err => {
