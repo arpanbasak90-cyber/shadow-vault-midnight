@@ -13,7 +13,7 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({
   onDisconnect,
 }) => {
   const [showModal, setShowModal] = useState(false);
-  const [passphrase, setPassphrase] = useState('');
+  const [passphrase, setPassphrase] = useState('testnet-spending-key-demo');
   const [loading, setLoading] = useState(false);
 
   const handleConnectClick = async () => {
@@ -31,13 +31,21 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({
     }
   };
 
+  const handleQuickDemoConnect = async () => {
+    setLoading(true);
+    try {
+      await onConnect('testnet-demo-key');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleModalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await onConnect(passphrase);
+      await onConnect(passphrase || 'testnet-demo-key');
       setShowModal(false);
-      setPassphrase('');
     } catch {
       // Error handled by hook
     } finally {
@@ -84,20 +92,33 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({
               </button>
             </div>
           ) : (
-            <button
-              className="btn"
-              onClick={handleConnectClick}
-              disabled={loading}
-            >
-              {loading ? 'Connecting...' : 'Connect Lace Wallet'}
-            </button>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button
+                className="btn btn-outline"
+                onClick={handleQuickDemoConnect}
+                disabled={loading}
+                style={{ fontSize: '0.85rem' }}
+              >
+                ⚡ Quick Demo Connect
+              </button>
+              <button
+                className="btn"
+                onClick={handleConnectClick}
+                disabled={loading}
+              >
+                {loading ? 'Connecting...' : 'Connect Lace Wallet'}
+              </button>
+            </div>
           )}
         </div>
       </div>
 
       {wallet.error && (
         <div className="alert alert-error" style={{ marginTop: '12px' }}>
-          <strong>Connection Error:</strong> {wallet.error}
+          <div><strong>Connection Error:</strong> {wallet.error}</div>
+          <div style={{ marginTop: '8px', fontSize: '0.8rem' }}>
+            💡 <em>Tip: You can click the <strong>⚡ Quick Demo Connect</strong> button above to connect immediately without installing browser extensions!</em>
+          </div>
         </div>
       )}
 
@@ -107,7 +128,7 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({
           <div className="card" style={{ width: '100%', maxWidth: '440px', margin: '0 20px' }}>
             <h3 style={{ fontSize: '1.1rem', marginBottom: '8px' }}>🔐 Lace Wallet Connection</h3>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>
-              Connect using your Lace Browser Extension or enter your Preprod spending passphrase:
+              Connect using your Lace Browser Extension or enter a Preprod testnet spending passphrase:
             </p>
 
             <form onSubmit={handleModalSubmit}>
@@ -119,7 +140,7 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({
                 placeholder="e.g. testnet seed phrase or spending key"
               />
 
-              <button type="submit" className="btn" style={{ width: '100%' }} disabled={loading}>
+              <button type="submit" className="btn" style={{ width: '100%', marginTop: '12px' }} disabled={loading}>
                 {loading ? 'Connecting...' : 'Authorize & Connect Preprod Wallet'}
               </button>
 
@@ -138,3 +159,4 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({
     </div>
   );
 };
+
