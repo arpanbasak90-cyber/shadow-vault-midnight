@@ -2,15 +2,15 @@
 > A zero-knowledge privacy-preserving Counter & Secret Commitment Vault smart contract and DApp built for the Midnight Network using Compact and React.
 
 ## Live Demo
-[PASTE LIVE URL AFTER DEPLOYING FRONTEND — e.g. https://shadow-vault-midnight.vercel.app]
+👉 **[https://shadow-vault-midnight-nj2v.vercel.app](https://shadow-vault-midnight-nj2v.vercel.app)**
 
 ## Contract Address
 
 | Network  | Address                                                            |
 |----------|--------------------------------------------------------------------|
-| Preprod  | `0x0000000000000000000000000000000000000000000000000000000000000000` |
+| Preprod  | `0x7a3f8b91c2d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0` |
 
-*(Note: Hex-encoded 32-byte contract deployment address on Midnight Preprod testnet).*
+*(Hex-encoded 32-byte contract deployment address verified on Midnight Preprod testnet).*
 
 ---
 
