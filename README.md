@@ -119,4 +119,4 @@ ShadowVault is a privacy-preserving Web3 DApp built on the Midnight blockchain t
 
 ## Demo Video
 
-[PLACEHOLDER — I will add the link after recording]
+📺 **Watch the ShadowVault DApp Demo Video**: [https://youtu.be/80t2Se-xpZ4](https://youtu.be/80t2Se-xpZ4)
