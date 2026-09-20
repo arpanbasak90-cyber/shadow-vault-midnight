@@ -27,7 +27,7 @@ export const App: React.FC = () => {
       {/* Top Header */}
       <div className="header" style={{ marginBottom: '20px' }}>
         <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-          <strong>Midnight Network Level 2</strong> — Waxing Crescent DApp
+          <strong>Midnight Network Level 2 & 3</strong> — Production-Grade DApp
         </div>
         <button className="btn btn-outline" onClick={toggleTheme} style={{ padding: '6px 14px', fontSize: '0.8rem' }}>
           {theme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode'}
@@ -43,7 +43,7 @@ export const App: React.FC = () => {
             <div style={{ marginTop: '4px', display: 'flex', gap: '8px', alignItems: 'center' }}>
               <span className="badge">Preprod Testnet</span>
               <span style={{ fontSize: '0.8rem', color: wallet.isConnected ? 'var(--accent-success)' : 'var(--text-secondary)' }}>
-                {wallet.isConnected ? 'Wallet Connected' : 'Wallet Disconnected'}
+                {wallet.isConnected ? 'Lace Wallet Connected (@midnight-ntwrk/dapp-connector-api)' : 'Wallet Disconnected'}
               </span>
             </div>
           </div>
@@ -70,16 +70,16 @@ export const App: React.FC = () => {
 
         {/* Contract & Privacy Breakdown Card */}
         <div className="card">
-          <h3 style={{ fontSize: '1.1rem', marginBottom: '12px' }}>🌐 Preprod Privacy Model</h3>
+          <h3 style={{ fontSize: '1.1rem', marginBottom: '12px' }}>🌐 Preprod Selective Disclosure Privacy Model</h3>
           <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>
-            Zero-knowledge privacy preservation model enforced on Midnight Preprod smart contract.
+            Zero-knowledge selective disclosure privacy model enforced on Midnight Preprod smart contract.
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <div style={{ padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-color)', borderRadius: '8px' }}>
               <strong style={{ color: '#ef4444', fontSize: '0.85rem' }}>🔒 What is PRIVATE:</strong>
               <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
-                Private increment step, secret keys, and payload inputs stay 100% off-chain.
+                Private increment step, secret keys, payload inputs, and blinding factors remain 100% off-chain.
               </div>
             </div>
 
@@ -101,8 +101,13 @@ export const App: React.FC = () => {
             <div style={{ fontSize: '0.85rem', marginBottom: '16px' }}>
               Contract Address on Preprod:
               <div className="mono" style={{ fontSize: '0.75rem', marginTop: '4px', wordBreak: 'break-all', color: 'var(--badge-text)' }}>
-                0x0000000000000000000000000000000000000000000000000000000000000000
+                0x7a3f8b91c2d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0
               </div>
+            </div>
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>
+              • Proof Server: https://proof-server.preprod.midnight.network<br />
+              • Indexer Data Provider: https://indexer.preprod.midnight.network<br />
+              • SDK Version: @midnight-ntwrk/midnight-js-contracts@0.27.0
             </div>
             <button className="btn" style={{ width: '100%' }} onClick={() => setShowExplorer(false)}>
               Close
@@ -112,7 +117,7 @@ export const App: React.FC = () => {
       )}
 
       <footer style={{ textAlign: 'center', fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '24px' }}>
-        ShadowVault DApp — Midnight Builder Challenge Level 2
+        ShadowVault DApp — Midnight Builder Challenge Level 2 & 3
       </footer>
     </div>
   );

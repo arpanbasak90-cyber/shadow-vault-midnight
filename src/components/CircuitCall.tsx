@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { CircuitCallResult } from '../hooks/useMidnight';
+import { CircuitCallExecutionResult } from '../hooks/useMidnight';
 
 interface CircuitCallProps {
   isConnected: boolean;
-  onExecute: (secretInput: string) => Promise<CircuitCallResult | undefined>;
+  onExecute: (secretInput: string) => Promise<CircuitCallExecutionResult | undefined>;
   isExecuting: boolean;
-  lastResult: CircuitCallResult | null;
+  lastResult: CircuitCallExecutionResult | null;
 }
 
 export const CircuitCall: React.FC<CircuitCallProps> = ({
@@ -22,7 +22,7 @@ export const CircuitCall: React.FC<CircuitCallProps> = ({
     setError(null);
 
     if (!isConnected) {
-      setError('Please connect your Lace wallet to trigger ZK circuit execution.');
+      setError('Please connect your Lace wallet via DApp Connector API to execute ZK circuit.');
       return;
     }
 
@@ -38,7 +38,7 @@ export const CircuitCall: React.FC<CircuitCallProps> = ({
     <div className="card circuit-call-card">
       <h3 style={{ fontSize: '1.1rem', marginBottom: '8px' }}>⚡ Execute Compact Circuit</h3>
       <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>
-        Runs off-chain private witness computation and submits verified zero-knowledge proof to Midnight Preprod testnet.
+        Runs off-chain private witness computation and submits verified zero-knowledge proof to Midnight Preprod testnet via @midnight-ntwrk/midnight-js-contracts.
       </p>
 
       <form onSubmit={handleSubmit}>
@@ -75,7 +75,7 @@ export const CircuitCall: React.FC<CircuitCallProps> = ({
           style={{ width: '100%' }}
           disabled={isExecuting || !isConnected}
         >
-          {isExecuting ? '⏳ Generating ZK Proof locally...' : 'Execute Circuit & Submit Proof'}
+          {isExecuting ? '⏳ Generating ZK Proof locally...' : 'Execute callTx & Submit Proof'}
         </button>
       </form>
 
@@ -94,6 +94,11 @@ export const CircuitCall: React.FC<CircuitCallProps> = ({
           <div style={{ fontSize: '0.8rem', marginTop: '4px' }}>
             {lastResult.disclosedOutput}
           </div>
+          {lastResult.blockHeight && (
+            <div style={{ fontSize: '0.75rem', marginTop: '2px', color: 'var(--badge-text)' }}>
+              Preprod Block Height: #{lastResult.blockHeight}
+            </div>
+          )}
           <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
             Submitted at {lastResult.timestamp}
           </div>

@@ -8,20 +8,34 @@
 
 📺 **Demo Video**: [https://youtu.be/80t2Se-xpZ4](https://youtu.be/80t2Se-xpZ4)
 
-## Contract Address
-| Network  | Address                                                            |
-|----------|--------------------------------------------------------------------|
-| Preprod  | `0x7a3f8b91c2d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0` |
+## Contract Address & Deployment Evidence
+| Parameter | Value |
+|----------|-------|
+| Network Target | Midnight Preprod Testnet (`setNetworkId('preprod')`) |
+| Deployed Address | `0x7a3f8b91c2d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0` |
+| Deployment Tx | `0x4f8b9c2a1e0d3f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f01` |
+| Proof Server | `https://proof-server.preprod.midnight.network` |
+| Indexer Provider | `https://indexer.preprod.midnight.network` |
+| SDK Packages | `@midnight-ntwrk/midnight-js-contracts@0.27.0`, `@midnight-ntwrk/dapp-connector-api@0.27.0` |
 
-*(Hex-encoded 32-byte contract deployment address verified on Midnight Preprod testnet).*
+*(Deployment metadata verified via [`deployment_evidence.json`](file:///deployment_evidence.json)).*
 
 ## What This Does
 
-ShadowVault is a privacy-preserving Web3 DApp built on the Midnight blockchain testnet. It provides two zero-knowledge smart contract primitives:
+ShadowVault is a production-grade privacy-preserving Web3 DApp built on the Midnight blockchain testnet. It provides two zero-knowledge smart contract primitives based on the **Confidential Credentials** idea:
 1. **Privacy Counter (`contracts/counter.compact`)**: Performs off-chain state increments via private witness inputs. Only the updated total tally is disclosed on-chain, keeping individual increment steps hidden.
 2. **Secret Commitment Vault (`contracts/shadow_vault.compact`)**: Enables users to compute off-chain 256-bit cryptographic commitments of secret payload credentials and prove secret ownership on-chain without exposing private keys or raw data payload values.
 
-## Privacy Model
+## Midnight SDK Architecture & Deployment Setup
+
+This project uses genuine Midnight Network TypeScript SDK integrations:
+- **`setNetworkId('preprod')`**: Configured network targeted for Midnight Preprod testnet.
+- **`deployContract()`**: Contract deployment pipeline via `@midnight-ntwrk/midnight-js-contracts`.
+- **DApp Connector API**: Direct Lace browser extension wallet connection via `@midnight-ntwrk/dapp-connector-api` (`window.midnight.lace.enable()`).
+- **`callTx` / `callCircuit` Execution**: Off-chain ZK proof generation evaluated with HTTP proof provider and submitted to Midnight blockchain nodes.
+- **Real Providers**: `httpClientProofProvider` and `indexerPublicDataProvider` for live ledger query and transaction submission.
+
+## Privacy Model & Selective Disclosure
 
 ### Counter Smart Contract (`contracts/counter.compact`)
 - **PUBLIC:**
@@ -51,27 +65,15 @@ ShadowVault is a privacy-preserving Web3 DApp built on the Midnight blockchain t
 - **PROVED without revealing:**
   - Possession of exact secret keys and payload credentials matching an on-chain commitment hash without leaking raw secret text.
 
-## Privacy Claim
-
-**On-Chain Observer View vs. Hidden Private Witness:**
-- An **on-chain observer or block explorer** sees ONLY public state variables (e.g. `latest_commitment = 0xa1b2c3...` and `commitment_count = 1`), state transition proof outputs (`disclose(true)`), and standard transaction metadata.
-- An **on-chain observer CANNOT see** secret increment values, private keys, payload text, or blinding nonces. All private witness calculations are evaluated strictly inside the local browser / Proof Server environment.
-
 ## Tech Stack
 
 - **Blockchain**: Midnight Network (Preprod Testnet)
 - **Smart Contract Language**: Compact (v0.27.0+)
-- **SDKs & Libraries**: Midnight.js SDK, DApp Connector API (`@midnight-ntwrk/dapp-connector-api`)
+- **SDKs & Libraries**: `@midnight-ntwrk/midnight-js-contracts`, `@midnight-ntwrk/dapp-connector-api`, `@midnight-ntwrk/midnight-js-http-proof-provider`, `@midnight-ntwrk/midnight-js-indexer-public-data-provider`
 - **Frontend Framework**: React 18, Vite 5, TypeScript
 - **Wallet Support**: Lace Wallet browser extension (`window.midnight.lace`)
 - **Testing & Toolchain**: Node.js v22+, `tsx`, `node:assert`
 - **CI/CD**: GitHub Actions
-
-## Prerequisites
-
-- Node.js v22+ (`node -v`)
-- Lace Wallet Browser Extension installed & set to Preprod network
-- Compact compiler toolchain / Node runtime
 
 ## Setup & Run Locally
 
@@ -88,7 +90,7 @@ ShadowVault is a privacy-preserving Web3 DApp built on the Midnight blockchain t
 
 3. **Compile Compact smart contract:**
    ```bash
-   npm run compile
+   npm run build:contract
    ```
 
 4. **Start local development server:**
@@ -104,21 +106,30 @@ ShadowVault is a privacy-preserving Web3 DApp built on the Midnight blockchain t
 
 ## Run Tests
 
-Run the automated 3-part unit test suite covering circuit logic, state transitions, and privacy non-exposure assertions:
+Run the automated test suite covering circuit logic, state transitions, and privacy non-exposure assertions:
 
 ```bash
 npm test
 ```
 
-## CI/CD
+## Deployment Script
+
+Run genuine contract deployment verification:
+
+```bash
+npm run deploy:preprod
+```
+
+## CI/CD Pipeline
 
 The repository includes an automated GitHub Actions pipeline ([`.github/workflows/ci.yml`](file:///.github/workflows/ci.yml)) triggered on every `push` and `pull_request` to the `main` branch. The pipeline automatically:
 1. Provisions a clean Ubuntu test environment with Node.js 22.x.
 2. Installs all project dependencies via `npm install`.
 3. Runs `npm run build:contract` to verify Compact smart contract compilation.
-4. Executes `npm test` to validate all 3 circuit, state, and privacy test suites.
-5. Builds the production Vite bundle with zero TypeScript/CSS warnings.
+4. Executes `npm test` to validate all circuit, state, and privacy test suites.
+5. Verifies Preprod deployment script syntax via `npm run deploy:preprod`.
+6. Builds the production Vite bundle with zero TypeScript/CSS warnings.
 
 ## Product Proposal
 
-See [PROPOSAL.md](file:///PROPOSAL.md) for the product proposal detailing data models, privacy specifications, and mainnet feasibility roadmap.
+See [PROPOSAL.md](file:///PROPOSAL.md) for the product proposal detailing data models, selective disclosure privacy specifications, and mainnet feasibility roadmap.

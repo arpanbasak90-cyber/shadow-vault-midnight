@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { WalletState } from '../hooks/useMidnight';
+import { MidnightWalletState } from '../hooks/useMidnight';
 
 interface WalletConnectProps {
-  wallet: WalletState;
-  onConnect: (passphrase?: string) => Promise<void>;
+  wallet: MidnightWalletState;
+  onConnect: () => Promise<void>;
   onDisconnect: () => void;
 }
 
@@ -12,42 +12,14 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({
   onConnect,
   onDisconnect,
 }) => {
-  const [showModal, setShowModal] = useState(false);
-  const [passphrase, setPassphrase] = useState('testnet-spending-key-demo');
   const [loading, setLoading] = useState(false);
 
   const handleConnectClick = async () => {
     setLoading(true);
     try {
-      if (typeof window !== 'undefined' && (window as any).midnight?.lace) {
-        await onConnect();
-      } else {
-        setShowModal(true);
-      }
+      await onConnect();
     } catch {
-      setShowModal(true);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleQuickDemoConnect = async () => {
-    setLoading(true);
-    try {
-      await onConnect('testnet-demo-key');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleModalSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      await onConnect(passphrase || 'testnet-demo-key');
-      setShowModal(false);
-    } catch {
-      // Error handled by hook
+      // Error state managed by useMidnight hook
     } finally {
       setLoading(false);
     }
@@ -57,15 +29,15 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({
     <div className="card wallet-connect-card">
       <div className="header">
         <div>
-          <h3 style={{ fontSize: '1.1rem', fontWeight: 600 }}>🔐 Midnight Wallet</h3>
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 600 }}>🔐 Midnight Lace Wallet</h3>
           <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
             {wallet.isConnected ? (
               <span style={{ color: 'var(--accent-success)', fontWeight: 600 }}>
-                ● Connected to {wallet.network}
+                ● Connected to {wallet.network} (via @midnight-ntwrk/dapp-connector-api)
               </span>
             ) : (
               <span style={{ color: '#ef4444', fontWeight: 500 }}>
-                ○ Wallet Disconnected
+                ○ Wallet Disconnected — Please connect Lace Wallet (Preprod)
               </span>
             )}
           </div>
@@ -92,71 +64,22 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({
               </button>
             </div>
           ) : (
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <button
-                className="btn btn-outline"
-                onClick={handleQuickDemoConnect}
-                disabled={loading}
-                style={{ fontSize: '0.85rem' }}
-              >
-                ⚡ Quick Demo Connect
-              </button>
-              <button
-                className="btn"
-                onClick={handleConnectClick}
-                disabled={loading}
-              >
-                {loading ? 'Connecting...' : 'Connect Lace Wallet'}
-              </button>
-            </div>
+            <button
+              className="btn"
+              onClick={handleConnectClick}
+              disabled={loading}
+            >
+              {loading ? 'Connecting via DApp Connector...' : 'Connect Lace Wallet (Preprod)'}
+            </button>
           )}
         </div>
       </div>
 
       {wallet.error && (
         <div className="alert alert-error" style={{ marginTop: '12px' }}>
-          <div><strong>Connection Error:</strong> {wallet.error}</div>
-          <div style={{ marginTop: '8px', fontSize: '0.8rem' }}>
-            💡 <em>Tip: You can click the <strong>⚡ Quick Demo Connect</strong> button above to connect immediately without installing browser extensions!</em>
-          </div>
-        </div>
-      )}
-
-      {/* Lace Wallet / Passphrase Modal */}
-      {showModal && (
-        <div className="modal-overlay">
-          <div className="card" style={{ width: '100%', maxWidth: '440px', margin: '0 20px' }}>
-            <h3 style={{ fontSize: '1.1rem', marginBottom: '8px' }}>🔐 Lace Wallet Connection</h3>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>
-              Connect using your Lace Browser Extension or enter a Preprod testnet spending passphrase:
-            </p>
-
-            <form onSubmit={handleModalSubmit}>
-              <label>Preprod Spending Passphrase / Seed:</label>
-              <textarea
-                rows={2}
-                value={passphrase}
-                onChange={e => setPassphrase(e.target.value)}
-                placeholder="e.g. testnet seed phrase or spending key"
-              />
-
-              <button type="submit" className="btn" style={{ width: '100%', marginTop: '12px' }} disabled={loading}>
-                {loading ? 'Connecting...' : 'Authorize & Connect Preprod Wallet'}
-              </button>
-
-              <button
-                type="button"
-                className="btn btn-outline"
-                style={{ width: '100%', marginTop: '8px' }}
-                onClick={() => setShowModal(false)}
-              >
-                Cancel
-              </button>
-            </form>
-          </div>
+          <div><strong>Connection Notice:</strong> {wallet.error}</div>
         </div>
       )}
     </div>
   );
 };
-

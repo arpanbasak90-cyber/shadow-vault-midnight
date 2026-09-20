@@ -11,7 +11,7 @@
     "compile": "node scripts/compile_contract.js",
     "compact compile": "node scripts/compile_contract.js",
     "build:contract": "node scripts/compile_contract.js",
-    "test": "npx tsx tests/counter.test.ts",
+    "test": "npx tsx tests/counter.test.ts && npx tsx tests/shadow_vault.test.ts",
     "test:counter": "npx tsx tests/counter.test.ts",
     "test:all": "npx tsx tests/counter.test.ts && npx tsx tests/shadow_vault.test.ts",
     "deploy": "node scripts/deploy.js",
@@ -26,8 +26,15 @@
     "blockchain",
     "counter"
   ],
-  "author": "Midnight Builder",
-  "license": "MIT",
+  "dependencies": {
+    "@midnight-ntwrk/compact-runtime": "^0.27.0",
+    "@midnight-ntwrk/dapp-connector-api": "^0.27.0",
+    "@midnight-ntwrk/midnight-js-contracts": "^0.27.0",
+    "@midnight-ntwrk/midnight-js-http-proof-provider": "^0.27.0",
+    "@midnight-ntwrk/midnight-js-indexer-public-data-provider": "^0.27.0",
+    "@midnight-ntwrk/midnight-js-leveldb-private-state-provider": "^0.27.0",
+    "@midnight-ntwrk/zswap": "^0.27.0"
+  },
   "devDependencies": {
     "@types/node": "^22.0.0",
     "@types/react": "^18.3.3",
