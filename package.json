@@ -27,13 +27,11 @@
     "counter"
   ],
   "dependencies": {
-    "@midnight-ntwrk/compact-runtime": "^0.27.0",
-    "@midnight-ntwrk/dapp-connector-api": "^0.27.0",
-    "@midnight-ntwrk/midnight-js-contracts": "^0.27.0",
-    "@midnight-ntwrk/midnight-js-http-proof-provider": "^0.27.0",
-    "@midnight-ntwrk/midnight-js-indexer-public-data-provider": "^0.27.0",
-    "@midnight-ntwrk/midnight-js-leveldb-private-state-provider": "^0.27.0",
-    "@midnight-ntwrk/zswap": "^0.27.0"
+    "@midnight-ntwrk/compact-runtime": "^0.19.0",
+    "@midnight-ntwrk/dapp-connector-api": "^4.0.1",
+    "@midnight-ntwrk/midnight-js-contracts": "^4.1.1",
+    "@midnight-ntwrk/midnight-js-indexer-public-data-provider": "^4.1.1",
+    "@midnight-ntwrk/zswap": "^4.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
