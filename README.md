@@ -6,77 +6,48 @@
 ## Live Demo
 👉 **[https://shadow-vault-midnight-nj2v.vercel.app](https://shadow-vault-midnight-nj2v.vercel.app)**
 
-📺 **Demo Video**: [https://youtu.be/80t2Se-xpZ4](https://youtu.be/80t2Se-xpZ4)
+## Contract Address
+| Network  | Address                          |
+|----------|----------------------------------|
+| Preprod  | `0x02005a7b89c0d1e2f3a4b5c6d7e8f90123456789abcdef0123456789abcdef01` |
 
-## Contract Address & Deployment Evidence
-| Parameter | Value |
-|----------|-------|
-| Network Target | Midnight Preprod Testnet (`setNetworkId('preprod')`) |
-| Deployed Address | `0x7a3f8b91c2d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0` |
-| Deployment Tx | `0x4f8b9c2a1e0d3f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f01` |
-| Proof Server | `https://proof-server.preprod.midnight.network` |
-| Indexer Provider | `https://indexer.preprod.midnight.network` |
-| SDK Packages | `@midnight-ntwrk/midnight-js-contracts@0.27.0`, `@midnight-ntwrk/dapp-connector-api@0.27.0` |
-
-*(Deployment metadata verified via [`deployment_evidence.json`](file:///deployment_evidence.json)).*
+*(Note: Replace with your deployed Midnight Preprod contract address from Level 1).*
 
 ## What This Does
-
-ShadowVault is a production-grade privacy-preserving Web3 DApp built on the Midnight blockchain testnet. It provides two zero-knowledge smart contract primitives based on the **Confidential Credentials** idea:
-1. **Privacy Counter (`contracts/counter.compact`)**: Performs off-chain state increments via private witness inputs. Only the updated total tally is disclosed on-chain, keeping individual increment steps hidden.
+ShadowVault is a production-grade privacy-preserving Web3 application on the Midnight blockchain testnet. It provides two zero-knowledge smart contract primitives based on confidential credentials:
+1. **Privacy Counter (`contracts/counter.compact`)**: Performs off-chain state increments via private witness inputs. Only the updated aggregate count is disclosed on-chain, keeping individual increment steps secret.
 2. **Secret Commitment Vault (`contracts/shadow_vault.compact`)**: Enables users to compute off-chain 256-bit cryptographic commitments of secret payload credentials and prove secret ownership on-chain without exposing private keys or raw data payload values.
 
-## Midnight SDK Architecture & Deployment Setup
-
-This project uses genuine Midnight Network TypeScript SDK integrations:
-- **`setNetworkId('preprod')`**: Configured network targeted for Midnight Preprod testnet.
-- **`deployContract()`**: Contract deployment pipeline via `@midnight-ntwrk/midnight-js-contracts`.
-- **DApp Connector API**: Direct Lace browser extension wallet connection via `@midnight-ntwrk/dapp-connector-api` (`window.midnight.lace.enable()`).
-- **`callTx` / `callCircuit` Execution**: Off-chain ZK proof generation evaluated with HTTP proof provider and submitted to Midnight blockchain nodes.
-- **Real Providers**: `httpClientProofProvider` and `indexerPublicDataProvider` for live ledger query and transaction submission.
-
-## Privacy Model & Selective Disclosure
-
-### Counter Smart Contract (`contracts/counter.compact`)
-- **PUBLIC:**
-  - Public aggregated counter total (`counter_value`: `Uint<64>`)
-  - Owner address hash (`owner`: `Bytes<32>`)
-  - Initialization status (`is_initialized`: `Boolean`)
-  - Disclosed state result (`disclose(new_value)`)
-
-- **PRIVATE:**
+## Privacy Model
+- **What is PUBLIC:**
+  - Aggregated public counter tally (`counter_value`: `Uint<64>`)
+  - Owner address key hash (`owner`: `Bytes<32>`)
+  - Contract initialization status (`is_initialized`: `Boolean`)
+  - Aggregate commitment count (`commitment_count`: `Uint<64>`)
+  - Disclosed 256-bit commitment hashes (`latest_commitment`: `Bytes<32>`)
+- **What is PRIVATE:**
   - Private increment step input (`witness get_increment_secret(): Uint<64>`)
-  - Off-chain intermediate calculations before disclosure
+  - Secret key witness inputs (`witness get_secret_key(): String`)
+  - Secret payload credentials (`witness get_secret_value(): String`)
+  - Random blinding factors (`witness get_blinding(): String`)
+- **What the user PROVES without revealing:**
+  - Valid knowledge of private increment values or possession of secret credentials matching an on-chain commitment hash without leaking raw secret inputs to network nodes.
 
-- **PROVED without revealing:**
-  - Off-chain knowledge of a positive increment value and valid state transition without exposing secret step inputs to network nodes.
-
-### ShadowVault Smart Contract (`contracts/shadow_vault.compact`)
-- **PUBLIC:**
-  - Total commitment count (`commitment_count`: `Uint<64>`)
-  - Latest disclosed commitment hash (`latest_commitment`: `Bytes<32>`)
-  - Verification result boolean (`disclose(true)`)
-
-- **PRIVATE:**
-  - Secret key (`get_secret_key()`)
-  - Secret payload data (`get_secret_value()`)
-  - Random blinding factor (`get_blinding()`)
-
-- **PROVED without revealing:**
-  - Possession of exact secret keys and payload credentials matching an on-chain commitment hash without leaking raw secret text.
+## Privacy Claim
+On-chain network nodes and observers see ONLY the verified zero-knowledge proof, the updated aggregate counter tally, and public 256-bit commitment hashes. An observer CANNOT see, reconstruct, or infer the user's private increment steps, secret keys, payload credentials, or blinding factors.
 
 ## Tech Stack
+- Midnight network (Preprod Testnet)
+- Compact smart contract DSL (v0.27.0+)
+- Midnight.js SDK (`@midnight-ntwrk/midnight-js-contracts`, `@midnight-ntwrk/midnight-js-indexer-public-data-provider`, `@midnight-ntwrk/midnight-js-network-id`)
+- React 18, Vite 5, TypeScript
+- Lace wallet DApp Connector (`@midnight-ntwrk/dapp-connector-api`)
 
-- **Blockchain**: Midnight Network (Preprod Testnet)
-- **Smart Contract Language**: Compact (v0.27.0+)
-- **SDKs & Libraries**: `@midnight-ntwrk/midnight-js-contracts`, `@midnight-ntwrk/dapp-connector-api`, `@midnight-ntwrk/midnight-js-http-proof-provider`, `@midnight-ntwrk/midnight-js-indexer-public-data-provider`
-- **Frontend Framework**: React 18, Vite 5, TypeScript
-- **Wallet Support**: Lace Wallet browser extension (`window.midnight.lace`)
-- **Testing & Toolchain**: Node.js v22+, `tsx`, `node:assert`
-- **CI/CD**: GitHub Actions
+## Prerequisites
+- Lace wallet extension installed (configured for Midnight Preprod)
+- Node.js v22+
 
-## Setup & Run Locally
-
+## Run Locally
 1. **Clone repository:**
    ```bash
    git clone https://github.com/arpanbasak90-cyber/shadow-vault-midnight.git
@@ -93,43 +64,20 @@ This project uses genuine Midnight Network TypeScript SDK integrations:
    npm run build:contract
    ```
 
-4. **Start local development server:**
+4. **Run test suite:**
+   ```bash
+   npm test
+   ```
+
+5. **Start development server:**
    ```bash
    npm run dev
    ```
-   Open `http://localhost:3000` in your browser.
 
-5. **Build production bundle:**
+6. **Build production bundle:**
    ```bash
    npm run build
    ```
 
-## Run Tests
-
-Run the automated test suite covering circuit logic, state transitions, and privacy non-exposure assertions:
-
-```bash
-npm test
-```
-
-## Deployment Script
-
-Run genuine contract deployment verification:
-
-```bash
-npm run deploy:preprod
-```
-
-## CI/CD Pipeline
-
-The repository includes an automated GitHub Actions pipeline ([`.github/workflows/ci.yml`](file:///.github/workflows/ci.yml)) triggered on every `push` and `pull_request` to the `main` branch. The pipeline automatically:
-1. Provisions a clean Ubuntu test environment with Node.js 22.x.
-2. Installs all project dependencies via `npm install`.
-3. Runs `npm run build:contract` to verify Compact smart contract compilation.
-4. Executes `npm test` to validate all circuit, state, and privacy test suites.
-5. Verifies Preprod deployment script syntax via `npm run deploy:preprod`.
-6. Builds the production Vite bundle with zero TypeScript/CSS warnings.
-
-## Product Proposal
-
-See [PROPOSAL.md](file:///PROPOSAL.md) for the product proposal detailing data models, selective disclosure privacy specifications, and mainnet feasibility roadmap.
+## Demo Video
+[https://youtu.be/80t2Se-xpZ4](https://youtu.be/80t2Se-xpZ4)

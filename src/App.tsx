@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useMidnight } from './hooks/useMidnight';
 import { WalletConnect } from './components/WalletConnect';
 import { CircuitCall } from './components/CircuitCall';
+import evidence from '../deployment_evidence.json';
 
 export const App: React.FC = () => {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
@@ -97,17 +98,18 @@ export const App: React.FC = () => {
       {showExplorer && (
         <div className="modal-overlay">
           <div className="card" style={{ width: '100%', maxWidth: '500px', margin: '0 20px' }}>
-            <h3 style={{ fontSize: '1.1rem', marginBottom: '12px' }}>🔍 Midnight Preprod Block Explorer</h3>
+            <h3 style={{ fontSize: '1.1rem', marginBottom: '12px' }}>🔍 Midnight Preprod Network Info</h3>
             <div style={{ fontSize: '0.85rem', marginBottom: '16px' }}>
-              Contract Address on Preprod:
+              Connected Wallet Address:
               <div className="mono" style={{ fontSize: '0.75rem', marginTop: '4px', wordBreak: 'break-all', color: 'var(--badge-text)' }}>
-                0x7a3f8b91c2d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0
+                {wallet.address || 'Connect Lace Wallet via DApp Connector'}
               </div>
             </div>
             <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>
-              • Proof Server: https://proof-server.preprod.midnight.network<br />
-              • Indexer Data Provider: https://indexer.preprod.midnight.network<br />
-              • SDK Version: @midnight-ntwrk/midnight-js-contracts@0.27.0
+              • Proof Server: {evidence.proofServerUrl}<br />
+              • Indexer Data Provider: {evidence.indexerUrl}<br />
+              • Target Network: {evidence.networkName}<br />
+              • SDK Package: {evidence.sdkVersion}
             </div>
             <button className="btn" style={{ width: '100%' }} onClick={() => setShowExplorer(false)}>
               Close

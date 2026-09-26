@@ -1,14 +1,14 @@
 {
-  "contractName": "Counter",
-  "contractAddress": "0x7a3f8b91c2d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0",
+  "contractName": "ShadowVault",
+  "contractAddress": "0x0000000000000000000000000000000000000000000000000000000000000001",
   "networkId": "preprod",
   "networkName": "Midnight Preprod Testnet",
   "proofServerUrl": "https://proof-server.preprod.midnight.network",
   "indexerUrl": "https://indexer.preprod.midnight.network",
-  "circuitHash": "8a21f7e34b9012a832c94d673bf82105c93a8e104b7b2190c427d140129a7583",
-  "deploymentTxHash": "0x4f8b9c2a1e0d3f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f01",
-  "deployedAt": "2026-09-20T22:30:00.000Z",
-  "status": "VERIFIED_ON_CHAIN",
-  "sdkVersion": "@midnight-ntwrk/midnight-js-contracts@0.27.0",
+  "circuitHash": "ed33dae0de709c64eb7961ca6b11a45668669a1c23fe9abf4b77188155c9650c",
+  "deploymentTxHash": "",
+  "deployedAt": "2026-09-24T06:27:38.741Z",
+  "status": "CONFIGURED_FOR_ONCHAIN",
+  "sdkVersion": "@midnight-ntwrk/midnight-js-contracts@4.1.1",
   "compactCompilerVersion": "0.27.0"
 }

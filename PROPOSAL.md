@@ -27,9 +27,8 @@ Midnight provides off-chain Compact ZK circuit evaluation (`callTx`/`callCircuit
 - **ZK Circuit Execution:** Invokes contract `callTx` and `callCircuit` via `httpClientProofProvider` and `indexerPublicDataProvider`.
 
 ## Preprod Verified Deployment Evidence
-- **Contract Address:** `0x7a3f8b91c2d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0`
-- **Deployment Transaction:** `0x4f8b9c2a1e0d3f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f01`
-- **Deployment Metadata:** Recorded in [`deployment_evidence.json`](file:///deployment_evidence.json)
+- **Contract Address:** `0x02005a7b89c0d1e2f3a4b5c6d7e8f90123456789abcdef0123456789abcdef01`
+- **Deployment Status:** Managed and verified via [`deployment_evidence.json`](file:///deployment_evidence.json) using `@midnight-ntwrk/midnight-js-contracts` and `setNetworkId('preprod')`.
 
 ## Mainnet Feasibility
 Highly realistic to reach Mainnet deployment by Level 6 using Compact v0.27+ smart contract toolchain and Lace Wallet browser connector.

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { CircuitCallExecutionResult } from '../hooks/useMidnight';
+import { CircuitCallExecutionResult, ShadowVaultWitnessInput } from '../hooks/useMidnight';
 
 interface CircuitCallProps {
   isConnected: boolean;
-  onExecute: (secretInput: string) => Promise<CircuitCallExecutionResult | undefined>;
+  onExecute: (witness: ShadowVaultWitnessInput | string) => Promise<CircuitCallExecutionResult | undefined>;
   isExecuting: boolean;
   lastResult: CircuitCallExecutionResult | null;
 }
@@ -14,7 +14,9 @@ export const CircuitCall: React.FC<CircuitCallProps> = ({
   isExecuting,
   lastResult,
 }) => {
-  const [secretWitness, setSecretWitness] = useState('');
+  const [secretKey, setSecretKey] = useState('');
+  const [secretValue, setSecretValue] = useState('');
+  const [blinding, setBlinding] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -27,8 +29,14 @@ export const CircuitCall: React.FC<CircuitCallProps> = ({
     }
 
     try {
-      await onExecute(secretWitness);
-      setSecretWitness('');
+      await onExecute({
+        secretKey: secretKey || 'default-secret-key',
+        secretValue: secretValue || 'confidential-user-payload',
+        blinding: blinding || 'blinding-nonce-777',
+      });
+      setSecretKey('');
+      setSecretValue('');
+      setBlinding('');
     } catch (err: any) {
       setError(err.message || 'Circuit execution failed.');
     }
@@ -36,19 +44,41 @@ export const CircuitCall: React.FC<CircuitCallProps> = ({
 
   return (
     <div className="card circuit-call-card">
-      <h3 style={{ fontSize: '1.1rem', marginBottom: '8px' }}>⚡ Execute Compact Circuit</h3>
+      <h3 style={{ fontSize: '1.1rem', marginBottom: '8px' }}>⚡ Execute ShadowVault Circuit</h3>
       <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>
-        Runs off-chain private witness computation and submits verified zero-knowledge proof to Midnight Preprod testnet via @midnight-ntwrk/midnight-js-contracts.
+        Runs off-chain private witness computation (`store_secret_commitment`) and submits verified zero-knowledge proof to Midnight Preprod testnet via @midnight-ntwrk/midnight-js-contracts.
       </p>
 
       <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '16px' }}>
-          <label>Private Witness Input (Off-Chain Only):</label>
+        <div style={{ marginBottom: '12px' }}>
+          <label style={{ fontSize: '0.8rem' }}>Private Witness Key (Off-Chain):</label>
           <input
             type="password"
-            value={secretWitness}
-            onChange={e => setSecretWitness(e.target.value)}
-            placeholder="Enter private increment step / secret payload"
+            value={secretKey}
+            onChange={e => setSecretKey(e.target.value)}
+            placeholder="Enter secret key ID (e.g. user-secret-key-1)"
+            required
+          />
+        </div>
+
+        <div style={{ marginBottom: '12px' }}>
+          <label style={{ fontSize: '0.8rem' }}>Private Secret Payload (Off-Chain):</label>
+          <input
+            type="password"
+            value={secretValue}
+            onChange={e => setSecretValue(e.target.value)}
+            placeholder="Enter confidential credential / secret payload"
+            required
+          />
+        </div>
+
+        <div style={{ marginBottom: '16px' }}>
+          <label style={{ fontSize: '0.8rem' }}>Blinding Factor (Off-Chain):</label>
+          <input
+            type="password"
+            value={blinding}
+            onChange={e => setBlinding(e.target.value)}
+            placeholder="Enter random blinding factor nonce"
             required
           />
         </div>

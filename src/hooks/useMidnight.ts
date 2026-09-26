@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { midnightService, MidnightWalletState, CircuitCallExecutionResult } from '../contract/midnightService';
+import { midnightService, MidnightWalletState, CircuitCallExecutionResult, ShadowVaultWitnessInput } from '../contract/midnightService';
 
-export type { MidnightWalletState, CircuitCallExecutionResult };
+export type { MidnightWalletState, CircuitCallExecutionResult, ShadowVaultWitnessInput };
 
 export function useMidnight() {
   const [wallet, setWallet] = useState<MidnightWalletState>({
@@ -46,14 +46,25 @@ export function useMidnight() {
     setLastResult(null);
   };
 
-  const executeCircuitCall = async (secretStep: string) => {
+  const executeCircuitCall = async (witnessInput: ShadowVaultWitnessInput | string) => {
     if (!wallet.isConnected) {
       throw new Error('Please connect your Lace wallet via DApp Connector API first.');
     }
 
+    let witness: ShadowVaultWitnessInput;
+    if (typeof witnessInput === 'string') {
+      witness = {
+        secretKey: witnessInput || 'default-user-key',
+        secretValue: 'confidential-payload-witness',
+        blinding: 'blinding-nonce-12345'
+      };
+    } else {
+      witness = witnessInput;
+    }
+
     setIsExecuting(true);
     try {
-      const result = await midnightService.executeCallTxIncrement(secretStep);
+      const result = await midnightService.executeShadowVaultCircuit(witness);
       setLastResult(result);
       return result;
     } catch (err: any) {
