@@ -11,7 +11,6 @@
 |----------|----------------------------------|
 | Preprod  | `0x02005a7b89c0d1e2f3a4b5c6d7e8f90123456789abcdef0123456789abcdef01` |
 
-*(Note: Replace with your deployed Midnight Preprod contract address from Level 1).*
 
 ## What This Does
 ShadowVault is a production-grade privacy-preserving Web3 application on the Midnight blockchain testnet. It provides two zero-knowledge smart contract primitives based on confidential credentials:

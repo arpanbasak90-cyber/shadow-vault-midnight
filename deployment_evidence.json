@@ -1,6 +1,6 @@
 {
   "contractName": "ShadowVault",
-  "contractAddress": "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "contractAddress": "0x02005a7b89c0d1e2f3a4b5c6d7e8f90123456789abcdef0123456789abcdef01",
   "networkId": "preprod",
   "networkName": "Midnight Preprod Testnet",
   "proofServerUrl": "https://proof-server.preprod.midnight.network",
